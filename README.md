@@ -2,6 +2,13 @@
 
 Source code for a life &amp; executive coaching website. Static HTML/CSS/JS, no build step.
 
+Live at: https://ama-ann.github.io/my-coaching-website/
+
+## Deployment
+
+Hosted on GitHub Pages, serving directly from the `main` branch root. Pushing to `main`
+auto-deploys — no build/CI step needed since it's plain HTML/CSS/JS.
+
 ## Pages
 
 - `index.html` — Home
