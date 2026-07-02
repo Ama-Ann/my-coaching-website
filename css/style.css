@@ -184,6 +184,24 @@ a {
   margin-top: 0;
 }
 
+.card-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.card-heading h3 {
+  margin: 0;
+}
+
+.card-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
 .card ul {
   margin: 0;
   padding-left: 20px;
