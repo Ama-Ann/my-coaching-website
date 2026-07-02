@@ -55,11 +55,19 @@ a {
 }
 
 .nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.3rem;
   font-weight: bold;
   color: var(--color-primary);
   text-decoration: none;
+}
+
+.nav-logo {
+  height: 36px;
+  width: 36px;
 }
 
 .nav-links {
