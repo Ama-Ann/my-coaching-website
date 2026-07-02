@@ -19,5 +19,4 @@ npx serve .
 
 ## TODO
 
-- Replace placeholder bio/copy in `about.html` with real content.
 - Connect the contact form (`contact.html`, `js/main.js`) to a form service (e.g. Formspree) or backend.
