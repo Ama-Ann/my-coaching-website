@@ -29,3 +29,15 @@ document.getElementById("contact-form").addEventListener("submit", function (eve
       submitButton.disabled = false;
     });
 });
+
+document.querySelectorAll(".calendar-tab").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".calendar-tab").forEach((t) => t.classList.remove("active"));
+    tab.classList.add("active");
+
+    const target = tab.dataset.target;
+    document.querySelectorAll(".calendly-inline-widget").forEach((widget) => {
+      widget.style.display = widget.id === target ? "" : "none";
+    });
+  });
+});
