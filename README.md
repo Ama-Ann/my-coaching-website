@@ -1,7 +1,23 @@
 # My Coaching Website
 
-Source code for my coaching website.
+Source code for a life &amp; executive coaching website. Static HTML/CSS/JS, no build step.
+
+## Pages
+
+- `index.html` — Home
+- `about.html` — About
+- `services.html` — Services (life coaching + business/executive coaching)
+- `contact.html` — Contact form (not yet wired to a backend — see below)
 
 ## Getting Started
 
-This project is just getting started — setup instructions will go here once the site's tech stack is chosen.
+Open `index.html` directly in a browser, or serve the folder locally, e.g.:
+
+```
+npx serve .
+```
+
+## TODO
+
+- Replace placeholder bio/copy in `about.html` with real content.
+- Connect the contact form (`contact.html`, `js/main.js`) to a form service (e.g. Formspree) or backend.
