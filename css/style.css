@@ -282,12 +282,12 @@ a {
   text-decoration: underline;
 }
 
-.blog-cta {
+.page-cta {
   margin-top: 48px;
   text-align: center;
 }
 
-.blog-cta p {
+.page-cta p {
   color: var(--color-text-muted);
   margin-bottom: 16px;
 }
