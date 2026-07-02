@@ -82,10 +82,23 @@
               Prefer to skip the form? Pick a time that works for you and
               it's booked &mdash; no back-and-forth needed.
             </p>
+
+            <div class="calendar-tabs" role="tablist">
+              <button type="button" class="calendar-tab active" data-target="calendly-consultation">Free Consultation Call</button>
+              <button type="button" class="calendar-tab" data-target="calendly-coaching">Coaching Session</button>
+            </div>
+
             <div
+              id="calendly-consultation"
               class="calendly-inline-widget"
               data-url="https://calendly.com/minhhai-pham/30min"
               style="min-width: 280px; height: 650px;"
+            ></div>
+            <div
+              id="calendly-coaching"
+              class="calendly-inline-widget"
+              data-url="https://calendly.com/minhhai-pham/coaching-session"
+              style="min-width: 280px; height: 650px; display: none;"
             ></div>
             <script
               type="text/javascript"
