@@ -30,6 +30,10 @@
         </p>
 
         <form class="contact-form" id="contact-form">
+          <input type="hidden" name="access_key" value="581ba7b4-ef05-47d1-ae43-d147c066f947">
+          <input type="hidden" name="subject" value="New inquiry from Hai Pham Coaching website">
+          <input type="checkbox" name="botcheck" class="hidden-field" style="display:none">
+
           <div>
             <label for="name">Name</label>
             <input type="text" id="name" name="name" required>
@@ -37,6 +41,16 @@
           <div>
             <label for="email">Email</label>
             <input type="email" id="email" name="email" required>
+          </div>
+          <div>
+            <label for="reason">What are you looking for?</label>
+            <select id="reason" name="reason">
+              <option value="General inquiry">General inquiry</option>
+              <option value="Free consultation call">Free consultation call</option>
+              <option value="Coaching session">Coaching session</option>
+              <option value="Meeting">Meeting</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
           <div>
             <label for="message">Message</label>
