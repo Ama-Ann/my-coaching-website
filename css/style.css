@@ -240,6 +240,23 @@ a {
 }
 
 /* Contact form */
+.contact-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .contact-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contact-calendar-col h3 {
+  margin-top: 0;
+}
+
 .contact-form {
   display: grid;
   gap: 16px;
