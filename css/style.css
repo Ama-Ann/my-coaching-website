@@ -253,7 +253,8 @@ a {
   }
 }
 
-.contact-calendar-col h3 {
+.contact-form-col h2,
+.contact-calendar-col h2 {
   margin-top: 0;
 }
 
