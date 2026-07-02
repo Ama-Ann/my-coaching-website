@@ -156,6 +156,35 @@ a {
   margin-top: 0;
 }
 
+/* About */
+.about-header {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+
+.about-photo {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 3px solid var(--color-bg-alt);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.about-header-intro {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .about-header {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
 /* Blog */
 .stack {
   display: flex;
