@@ -70,6 +70,12 @@ a {
   width: 36px;
 }
 
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
 .nav-links {
   display: flex;
   gap: 28px;
@@ -87,6 +93,49 @@ a {
 .nav-links a:hover,
 .nav-links a.active {
   color: var(--color-accent);
+}
+
+/* Language toggle */
+.lang-toggle {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.lang-toggle button {
+  padding: 6px 12px;
+  border: none;
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lang-toggle button.active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* i18n show/hide */
+.i18n-block[data-lang="vi"],
+.i18n-inline[data-lang="vi"] {
+  display: none;
+}
+
+html.lang-vi .i18n-block[data-lang="en"],
+html.lang-vi .i18n-inline[data-lang="en"] {
+  display: none;
+}
+
+html.lang-vi .i18n-block[data-lang="vi"] {
+  display: block;
+}
+
+html.lang-vi .i18n-inline[data-lang="vi"] {
+  display: inline;
 }
 
 /* Page banner */
@@ -396,6 +445,11 @@ a {
 
 @media (max-width: 640px) {
   .nav {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .nav-right {
     flex-direction: column;
     gap: 12px;
   }
