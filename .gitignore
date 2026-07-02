@@ -3,3 +3,5 @@ Thumbs.db
 node_modules/
 .env
 *.docx
+Post [0-9]*.html
+Post [0-9]*_files/
