@@ -2,12 +2,23 @@
 
 Source code for a life &amp; executive coaching website. Static HTML/CSS/JS, no build step.
 
-Live at: https://ama-ann.github.io/my-coaching-website/
+Live at: https://hai-pham-coaching.netlify.app
 
 ## Deployment
 
-Hosted on GitHub Pages, serving directly from the `main` branch root. Pushing to `main`
-auto-deploys — no build/CI step needed since it's plain HTML/CSS/JS.
+Hosted on Netlify, serving directly from the `main` branch root (publish directory `.`,
+no build command). Pushing to `main` auto-deploys once continuous deployment is linked
+in the Netlify dashboard (Site settings → Build & deploy → Link repository).
+
+GitHub Pages was tried first but is now disabled — it had repeated platform-side
+deployment failures unrelated to this repo's content. Netlify was chosen as a more
+reliable, commonly-used alternative with the same git-push-to-deploy workflow.
+
+**Security note:** deploy from git (`main` branch), not from local disk (`netlify deploy
+--dir=.` run from the project folder). The project folder contains gitignored files
+(resume, personal photos, raw LinkedIn exports) that are excluded from the git repo but
+would be uploaded if deployed directly from disk. Deploying from the linked GitHub repo
+only ever sees what's actually committed, which is the safe boundary.
 
 ## Pages
 
