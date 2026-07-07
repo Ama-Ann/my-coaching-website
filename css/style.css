@@ -236,7 +236,7 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
   background: var(--color-bg-alt);
   border: 1px solid #ddd;
   border-radius: var(--radius);
-  padding: 28px;
+  padding: 20px 28px;
   box-shadow: 0 3px 12px rgba(31, 58, 61, 0.08);
 }
 
@@ -327,7 +327,7 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 16px;
 }
 
 .blog-post-illustration {
@@ -394,7 +394,7 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 
 /* FAQ */
 .faq-item {
-  padding: 24px 28px;
+  padding: 14px 22px;
 }
 
 .faq-question {
