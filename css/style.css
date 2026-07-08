@@ -161,8 +161,18 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 /* Hero */
 .hero {
   padding: 80px 0 24px;
-  text-align: center;
   background: linear-gradient(180deg, var(--color-bg-alt), var(--color-bg));
+}
+
+.hero-inner {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+
+.hero-content {
+  flex: 1 1 60%;
+  text-align: left;
 }
 
 .hero h1 {
@@ -173,8 +183,54 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 .hero p {
   font-size: 1.15rem;
   color: var(--color-text-muted);
-  max-width: 640px;
-  margin: 0 auto 32px;
+  max-width: 560px;
+  margin: 0 0 32px;
+}
+
+.hero-photo {
+  flex: 1 1 40%;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-photo img {
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 16px;
+  display: block;
+}
+
+@media (max-width: 1023px) {
+  .hero-photo img {
+    max-width: 240px;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hero-content {
+    text-align: center;
+  }
+
+  .hero p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-photo {
+    width: 100%;
+  }
+
+  .hero-photo img {
+    max-width: 280px;
+  }
 }
 
 /* Buttons */
