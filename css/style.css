@@ -353,7 +353,7 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 /* About */
 .about-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 32px;
   margin-bottom: 40px;
 }
@@ -370,6 +370,14 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 
 .about-header-intro {
   margin: 0;
+}
+
+.about-header-intro p {
+  margin: 0 0 16px;
+}
+
+.about-header-intro p:last-child {
+  margin-bottom: 0;
 }
 
 @media (max-width: 640px) {
