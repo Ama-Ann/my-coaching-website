@@ -656,21 +656,40 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
   }
 }
 
-/* Testimonials */
-.testimonial-card {
+/* Quote */
+.quote-section {
   text-align: center;
 }
 
-.testimonial-quote-icon {
-  width: 28px;
-  height: 28px;
+.quote-mark-icon {
+  width: 32px;
+  height: 32px;
   color: var(--color-accent);
-  margin-bottom: 12px;
+  margin-bottom: 24px;
 }
 
-.testimonial-placeholder {
-  color: var(--color-text-muted);
+.quote-block {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.quote-block + .quote-block {
+  margin-top: 32px;
+}
+
+.quote-text {
+  font-family: Georgia, "Times New Roman", serif;
   font-style: italic;
+  font-size: 1.35rem;
+  line-height: 1.5;
+  color: var(--color-primary);
+  margin: 0 0 16px;
+}
+
+.quote-attribution {
+  font-style: normal;
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
