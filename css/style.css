@@ -26,6 +26,7 @@ h1, h2, h3 {
   font-family: Georgia, "Times New Roman", serif;
   color: var(--color-primary);
   line-height: 1.25;
+  text-wrap: balance;
 }
 
 a {
@@ -176,7 +177,7 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 }
 
 .hero h1 {
-  font-size: 2.6rem;
+  font-size: 2.4rem;
   margin-bottom: 16px;
 }
 
@@ -446,6 +447,7 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
   border-left: 3px solid var(--color-accent);
   font-style: italic;
   color: var(--color-text-muted);
+  text-wrap: balance;
 }
 
 .post-preview {
@@ -673,10 +675,6 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
   margin: 0 auto;
 }
 
-.quote-block + .quote-block {
-  margin-top: 32px;
-}
-
 .quote-text {
   font-family: Georgia, "Times New Roman", serif;
   font-style: italic;
@@ -684,6 +682,7 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
   line-height: 1.5;
   color: var(--color-primary);
   margin: 0 0 16px;
+  text-wrap: balance;
 }
 
 .quote-attribution {
