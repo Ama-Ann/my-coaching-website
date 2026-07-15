@@ -408,10 +408,11 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
   box-shadow: 0 8px 24px rgba(31, 58, 61, 0.25);
 }
 
-/* Never upscale past each photo's native resolution, or it turns blurry */
+/* These two source photos are only 160px wide; cap growth at 2x native
+   so the expand is still clearly visible without turning noticeably blurry */
 .blog-post.image-expanded > img[src*="blog-illustration-crossroads"],
 .blog-post.image-expanded > img[src*="blog-illustration-panel"] {
-  max-width: 160px;
+  max-width: 320px;
 }
 
 .blog-post.image-expanded > img[src*="blog-illustration-road"],
