@@ -408,6 +408,18 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
   box-shadow: 0 8px 24px rgba(31, 58, 61, 0.25);
 }
 
+/* Never upscale past each photo's native resolution, or it turns blurry */
+.blog-post.image-expanded > img[src*="blog-illustration-crossroads"],
+.blog-post.image-expanded > img[src*="blog-illustration-panel"] {
+  max-width: 160px;
+}
+
+.blog-post.image-expanded > img[src*="blog-illustration-road"],
+.blog-post.image-expanded > img[src*="blog-illustration-seed"],
+.blog-post.image-expanded > img[src*="blog-illustration-fish"] {
+  max-width: 480px;
+}
+
 .blog-post-illustration-wrap {
   float: right;
   width: 130px;
@@ -417,6 +429,7 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 
 .blog-post.image-expanded .blog-post-illustration-wrap {
   width: 50%;
+  max-width: 800px;
 }
 
 .blog-post-illustration-wrap .blog-post-illustration {
