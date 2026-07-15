@@ -40,6 +40,6 @@ npx serve .
 
 The contact form (`contact.html`, `js/main.js`) submits to [Web3Forms](https://web3forms.com/)
 using the access key embedded in `contact.html`, which emails submissions straight to
-minhhai.pham@gmail.com. Web3Forms access keys are meant to be public/client-side (like a site
+hai.pham@erickson.vn. Web3Forms access keys are meant to be public/client-side (like a site
 key), so this is safe to commit. If the key ever needs to be rotated, generate a new one at
 web3forms.com and swap the `value` of the `access_key` hidden input.
