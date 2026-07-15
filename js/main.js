@@ -1,8 +1,8 @@
 const contactStatusText = {
   sending: { en: "Sending...", vi: "Đang gửi..." },
   success: {
-    en: "Thanks! Your message has been sent — I'll get back to you within a couple of days.",
-    vi: "Cảm ơn bạn! Tin nhắn đã được gửi — tôi sẽ phản hồi trong vòng vài ngày.",
+    en: "Thanks! Your message has been sent — I'll get back to you within 24 hours.",
+    vi: "Cảm ơn bạn! Tin nhắn đã được gửi — tôi sẽ phản hồi trong vòng 24 giờ.",
   },
   error: {
     en: "Something went wrong sending your message. Please email me directly instead.",
