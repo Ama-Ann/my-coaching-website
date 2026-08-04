@@ -417,7 +417,9 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 
 .blog-post.image-expanded > img[src*="blog-illustration-road"],
 .blog-post.image-expanded > img[src*="blog-illustration-seed"],
-.blog-post.image-expanded > img[src*="blog-illustration-fish"] {
+.blog-post.image-expanded > img[src*="blog-illustration-fish"],
+.blog-post.image-expanded > img[src*="blog-illustration-papaya-tree"],
+.blog-post.image-expanded > img[src*="blog-illustration-questions"] {
   max-width: 480px;
 }
 
