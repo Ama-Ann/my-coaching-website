@@ -413,7 +413,8 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 .blog-post.image-expanded > img[src*="blog-illustration-fish"],
 .blog-post.image-expanded > img[src*="blog-illustration-papaya-tree"],
 .blog-post.image-expanded > img[src*="blog-illustration-questions"],
-.blog-post.image-expanded > img[src*="blog-illustration-doors"] {
+.blog-post.image-expanded > img[src*="blog-illustration-doors"],
+.blog-post.image-expanded > img[src*="blog-illustration-costume-party"] {
   max-width: 480px;
 }
 
