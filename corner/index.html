@@ -637,7 +637,9 @@ const I = LL.i18n = {
   set(l){ I.lang=l; if(LL.state.meta){LL.state.meta.lang=l; LL.db.put('meta',Object.assign({key:'app'},LL.state.meta));}
     document.getElementById('langEN').classList.toggle('on',l==='en');
     document.getElementById('langVI').classList.toggle('on',l==='vi');
-    I.apply(); LL.blocks.render(); LL.library.render(); LL.registry.renderPickers(); LL.ui.renderCGV();},
+    // apply() resets every [data-i18n] element, including the client chip's "No client" placeholder,
+    // so redraw the header afterwards to put the real client name back.
+    I.apply(); LL.ui.renderHeader(); LL.blocks.render(); LL.library.render(); LL.registry.renderPickers(); LL.ui.renderCGV();},
   apply(){ document.querySelectorAll('[data-i18n]').forEach(e=>{const v=I.t(e.getAttribute('data-i18n')); if(typeof v==='string')e.textContent=v;});
     document.documentElement.lang=I.lang; if(LL.ui&&LL.ui.renderBrand)LL.ui.renderBrand(); }
 };
@@ -3242,6 +3244,136 @@ LL.registry.register({
     data.stages.forEach((s,i)=>{ if((s.fwd||'').trim())h+='<p><b>'+names[i]+':</b> '+esc(s.fwd)+'</p>'; });
     return h; }
 });
+
+
+/* ===== exercise: model-of-success.js ===== */
+/* Model of Success — the Four Quadrants of Success / Happiness (Erickson Coaching).
+   Four diamonds around a "Success and Happiness" centre, explored in the recommended order:
+   1 Creative Planning (black) → 2 Achievement (yellow) → 3 Significant Moments (orange)
+   → 4 Legacy & Leadership (navy). Three numbered lines per quadrant; the note box under the
+   map holds the overall success criteria (the centre circle). */
+(function(){
+const QUADS=[   // pos = where the diamond sits around the centre
+  {k:'creative',    pos:'right',  n:1, cls:'black',  t:{en:'Creative Planning',     vi:'Lập kế hoạch sáng tạo'}},
+  {k:'achievement', pos:'bottom', n:2, cls:'yellow', t:{en:'Achievement',           vi:'Thành tựu'}},
+  {k:'moments',     pos:'left',   n:3, cls:'orange', t:{en:'Significant Moments',   vi:'Các khoảnh khắc ý nghĩa'}},
+  {k:'legacy',      pos:'top',    n:4, cls:'navy',   t:{en:'Legacy & Leadership',   vi:'Di sản & Lãnh đạo'}}
+];
+const I18N={
+  en:{center:'Success and Happiness', noteLabel:'Success and Happiness: overall success criteria',
+      notePh:'Picture balanced success 1–5 years from now. What are some of its key elements? What might successful balance look like for you? What might success look like to your stakeholders?',
+      title:'Model of success'},
+  vi:{center:'Thành công & Hạnh phúc', noteLabel:'Thành công & Hạnh phúc: tiêu chí thành công tổng thể',
+      notePh:'Hình dung thành công cân bằng trong 1–5 năm tới. Những yếu tố cốt lõi nào tạo nên thành công đó? Trạng thái cân bằng thành công trông như thế nào với bạn? Những người liên quan sẽ nhìn nhận thành công của bạn như thế nào?',
+      title:'Model of success'}
+};
+
+LL.registry.register({
+  id:'model-of-success', version:1,
+  title:{en:'Model of success', vi:'Model of success'},
+  desc:{en:'Four quadrants of success & happiness', vi:'4 góc phần tư của Thành công / Hạnh phúc'},
+  icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 2l4 4-4 4-4-4zM18 8l4 4-4 4-4-4zM12 14l4 4-4 4-4-4zM6 8l4 4-4 4-4-4z"/></svg>',
+  i18n:I18N,
+
+  createData(){ const q={}; QUADS.forEach(x=>q[x.k]=['','','']); return {quads:q, center:'', actions:[]}; },
+
+  render(container, data, ctx){
+    const el=LL.util.el, P=LL.primitives, lang=ctx.lang==='vi'?'vi':'en', L=I18N[lang];
+    data.quads=data.quads||{}; data.actions=data.actions||[];
+    const root=el('div',{class:'mos'});
+    const map=el('div',{class:'mos-map'});
+
+    QUADS.forEach(q=>{
+      const lines=data.quads[q.k]||(data.quads[q.k]=['','','']);
+      map.appendChild(el('div',{class:`mos-shape mos-${q.pos} mos-${q.cls}`,'aria-hidden':'true'}));
+      map.appendChild(el('div',{class:`mos-knob mos-${q.pos} mos-${q.cls}`,'aria-hidden':'true'},String(q.n)));
+      const box=el('div',{class:`mos-q mos-${q.pos} mos-${q.cls}`},
+        el('div',{class:'mos-qt'},el('span',{class:'mos-qn'},q.n+'.'),q.t[lang]));
+      [0,1,2].forEach(i=>{
+        const inp=el('input',{type:'text',class:'mos-in','aria-label':q.t[lang]+' '+(i+1),
+          oninput(e){lines[i]=e.target.value;ctx.update();}});
+        inp.value=lines[i]||'';
+        box.appendChild(el('label',{class:'mos-line'},el('span',{},(i+1)+'.'),inp));
+      });
+      map.appendChild(box);
+    });
+
+    // centre circle: clicking it jumps to the note box underneath
+    let noteTa;
+    map.appendChild(el('button',{type:'button',class:'mos-center',title:L.noteLabel,
+      onclick(){ if(noteTa){ noteTa.focus(); noteTa.scrollIntoView({block:'center',behavior:'smooth'}); } }},
+      el('span',{},L.center)));
+    root.appendChild(map);
+
+    // note for the centre circle
+    noteTa=P.note(()=>data.center, v=>{data.center=v;ctx.update();}, L.notePh);
+    noteTa.classList.add('mos-note');
+    root.appendChild(el('div',{class:'mos-notebox'},
+      el('div',{class:'mos-notelab'},el('span',{class:'mos-dot','aria-hidden':'true'}),L.noteLabel), noteTa));
+
+    root.appendChild(el('div',{},P.label(LL.i18n.t('wg_actions')),P.actionList(data.actions,()=>ctx.update())));
+    container.appendChild(root);
+  },
+
+  exportSummary(data, lang){
+    const esc=LL.util.esc, L=I18N[lang]||I18N.en, lg=I18N[lang]?lang:'en';
+    const cols={black:'#2A2723',yellow:'#D9A400',orange:'#E07B39',navy:'#1F3A68'};
+    let h='<h2>'+esc(L.title)+'</h2>';
+    if((data.center||'').trim()) h+='<p><b>'+esc(L.center)+':</b> '+esc(data.center).replace(/\n/g,'<br>')+'</p>';
+    QUADS.forEach(q=>{
+      const items=((data.quads||{})[q.k]||[]).filter(x=>(x||'').trim());
+      if(!items.length) return;
+      h+=`<p style="margin:10px 0 4px;font-weight:700;color:${cols[q.cls]}">${q.n}. ${esc(q.t[lg])}</p><ol style="margin:0 0 6px 20px;padding:0">`
+        + items.map(x=>'<li>'+esc(x)+'</li>').join('') + '</ol>';
+    });
+    return h;
+  },
+
+  css:`
+  .mos{display:flex;flex-direction:column;gap:16px;container-type:inline-size;}
+  .mos-map{position:relative;width:100%;max-width:720px;aspect-ratio:1;margin:0 auto;}
+  .mos-black{--mos:#2A2723;} .mos-yellow{--mos:#E2AE12;} .mos-orange{--mos:#E07B39;} .mos-navy{--mos:#1F3A68;}
+  body.calm .mos-black{--mos:#D8D2E6;} body.calm .mos-navy{--mos:#7FA3E0;}
+  body.calm .mos-center,body.calm .mos-dot{background:conic-gradient(from -45deg,#7FA3E0 0 90deg,#D8D2E6 90deg 180deg,#E2AE12 180deg 270deg,#E07B39 270deg 360deg);}
+  .mos-top{--x:50%;--y:25%;} .mos-right{--x:75%;--y:50%;} .mos-bottom{--x:50%;--y:75%;} .mos-left{--x:25%;--y:50%;}
+  .mos-shape{position:absolute;left:var(--x);top:var(--y);width:33%;aspect-ratio:1;transform:translate(-50%,-50%) rotate(45deg);
+    border:3px solid var(--mos);border-radius:14px;background:color-mix(in srgb,var(--mos) 7%,var(--surface));}
+  .mos-knob{position:absolute;width:28px;height:28px;border-radius:50%;background:var(--mos);color:#fff;font-weight:700;font-size:13px;
+    display:grid;place-items:center;transform:translate(-50%,-50%);box-shadow:0 2px 6px rgba(0,0,0,.15);}
+  body.calm .mos-knob.mos-black{color:#1B0E33;}
+  .mos-knob.mos-top{left:50%;top:2.2%;} .mos-knob.mos-bottom{left:50%;top:97.8%;}
+  .mos-knob.mos-left{left:2.2%;top:50%;} .mos-knob.mos-right{left:97.8%;top:50%;}
+  .mos-q{position:absolute;left:var(--x);top:var(--y);width:28%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:4px;}
+  .mos-qt{font-weight:700;font-size:13.5px;line-height:1.25;color:var(--mos);text-align:center;margin-bottom:2px;}
+  .mos-qn{margin-right:4px;}
+  .mos-line{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--ink-faint);}
+  .mos-in{flex:1;min-width:0;height:27px;border:none;border-bottom:1.5px solid color-mix(in srgb,var(--mos) 45%,transparent);
+    background:transparent;font:inherit;font-size:13.5px;font-weight:400;color:var(--ink);padding:0 3px;}
+  .mos-in:focus{outline:none;border-bottom-color:var(--mos);background:color-mix(in srgb,var(--mos) 8%,transparent);border-radius:4px 4px 0 0;}
+  .mos-center{position:absolute;left:50%;top:50%;width:21%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;padding:7px;cursor:pointer;
+    background:conic-gradient(from -45deg,#1F3A68 0 90deg,#2A2723 90deg 180deg,#E2AE12 180deg 270deg,#E07B39 270deg 360deg);
+    box-shadow:0 4px 14px rgba(0,0,0,.12);border:none;}
+  .mos-center span{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:var(--surface);
+    font-family:var(--display);font-weight:700;font-size:clamp(11px,2.2cqi,15px);line-height:1.2;color:var(--ink);text-align:center;padding:6px;}
+  .mos-center:hover span{background:var(--surface-2);}
+  .mos-notebox{max-width:720px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:6px;}
+  .mos-notelab{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;}
+  .mos-dot{width:14px;height:14px;border-radius:50%;flex:0 0 14px;
+    background:conic-gradient(from -45deg,#1F3A68 0 90deg,#2A2723 90deg 180deg,#E2AE12 180deg 270deg,#E07B39 270deg 360deg);}
+  .mos-note{min-height:96px;}
+  /* narrow blocks: stack the quadrants as cards (diamonds get too small to type in) */
+  @container (max-width:560px){
+    .mos-map{aspect-ratio:auto;display:flex;flex-direction:column;gap:10px;}
+    .mos-shape,.mos-knob{display:none;}
+    .mos-q{position:static;transform:none;width:auto;border:2px solid var(--mos);border-left-width:6px;border-radius:12px;padding:10px 12px;
+      background:color-mix(in srgb,var(--mos) 7%,var(--surface));}
+    .mos-qt{text-align:left;}
+    .mos-q.mos-right{order:1;} .mos-q.mos-bottom{order:2;} .mos-q.mos-left{order:3;} .mos-q.mos-top{order:4;}
+    .mos-center{position:static;transform:none;order:0;width:120px;align-self:center;}
+  }
+  `
+});
+})();
 
 LL.boot();
 </script>
