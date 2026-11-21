@@ -71,6 +71,45 @@ a {
   width: 36px;
 }
 
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* "To my corner" button next to the site title: links to the in-session tool at /corner/ */
+.nav-corner {
+  padding: 6px 14px;
+  border: 1.5px solid var(--color-accent);
+  border-radius: 999px;
+  color: var(--color-accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.nav-corner:hover,
+.nav-corner:focus-visible {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.nav-links a {
+  white-space: nowrap;
+}
+
+/* Tablet widths: title + button and the menu no longer fit on one row,
+   so put them on two centred rows instead of squeezing the menu. */
+@media (max-width: 1023px) {
+  .nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 24px;
+  }
+}
+
 .nav-right {
   display: flex;
   align-items: center;
@@ -780,12 +819,23 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 @media (max-width: 640px) {
   .nav {
     flex-direction: column;
+    flex-wrap: nowrap;
     gap: 12px;
   }
 
   .nav-right {
     flex-direction: column;
     gap: 12px;
+  }
+
+  .nav-left {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 16px;
+  }
+
+  .nav-brand {
+    white-space: nowrap;
   }
 
   .nav-links {
