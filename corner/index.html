@@ -1406,6 +1406,144 @@ LL.boot=async function(){
 })(LL);
 window.LL = LL;
 
+/* ===== exercise: metaprogs.js ===== */
+/* MetaProgs — intake form for profiling a client's meta programs (motivational traits).
+   Filled in by the coach during the first session. Layout follows the Word form
+   "Phiếu khai vấn Meta Programs"; English wording follows "Determining a client's metaprograms".
+   Coach-only: no exportSummary, so it never appears in the client takeaway. */
+(function(){
+// Each trait: optional question, trait label, option groups (convincers has two side-by-side groups).
+const TRAITS=[
+  {k:'reason', q:{en:'Why did you decide to explore coaching?', vi:'Vì sao bạn quyết định tìm hiểu về khai vấn?'},
+   t:{en:'Reason', vi:'Lý do (Reason)'},
+   opts:[[['possibilities',{en:'Possibilities',vi:'Khả năng (Possibilities)'}],['procedures',{en:'Procedures',vi:'Quy trình (Procedures)'}]]]},
+  {k:'level', q:{en:'What do you want in a coaching relationship? What do you want in a coach?', vi:'Bạn mong muốn điều gì trong mối quan hệ khai vấn? Bạn mong muốn điều gì ở người khai vấn?'},
+   t:{en:'Level', vi:'Mức độ (Level)'},
+   opts:[[['proactive',{en:'Proactive',vi:'Chủ động (Proactive)'}],['reflective',{en:'Reflective',vi:'Suy ngẫm (Reflective)'}]]]},
+  {k:'direction', q:{en:'What will having [client’s criteria] do for you?', vi:'Có được [tiêu chí của khách hàng] sẽ mang lại điều gì cho bạn?'},
+   t:{en:'Direction', vi:'Hướng (Direction)'},
+   opts:[[['towards',{en:'Towards',vi:'Hướng tới (Towards)'}],['away',{en:'Away from',vi:'Tránh xa (Away from)'}]]]},
+  {k:'decision', q:{en:'What is the relationship between your most important goals this year and last year?', vi:'Mối liên hệ giữa mục tiêu quan trọng nhất của bạn năm nay và năm ngoái là gì?'},
+   t:{en:'Decision factors', vi:'Yếu tố quyết định (Decision factors)'},
+   opts:[[['same',{en:'Sameness',vi:'Giống nhau (Sameness)'}],['samediff',{en:'Sameness with some difference',vi:'Giống nhau, có chút khác biệt (Sameness with some difference)'}],['diff',{en:'Difference',vi:'Khác biệt (Difference)'}]]]},
+  {k:'source', q:{en:'How do you know you have done a good job (at an important goal from last year)?', vi:'Làm sao bạn biết mình đã làm tốt (với mục tiêu quan trọng của năm ngoái)?'},
+   t:{en:'Source', vi:'Nguồn (Source)'},
+   opts:[[['internal',{en:'Internal',vi:'Bên trong (Internal)'}],['external',{en:'External',vi:'Bên ngoài (External)'}]]]},
+  {k:'scope', t:{en:'Scope', vi:'Phạm vi (Scope)'},
+   opts:[[['specific',{en:'Specific',vi:'Chi tiết (Specific)'}],['global',{en:'Global',vi:'Tổng quát (Global)'}]]]},
+  {k:'attention', t:{en:'Attention direction', vi:'Hướng chú ý (Attention direction)'},
+   opts:[[['self',{en:'Self',vi:'Bản thân (Self)'}],['other',{en:'Other',vi:'Người khác (Other)'}]]]},
+  {k:'convincers', t:{en:'Convincers', vi:'Yếu tố thuyết phục (Convincers)'},
+   opts:[
+     [['see',{en:'See',vi:'Nhìn (See)'}],['hear',{en:'Hear',vi:'Nghe (Hear)'}],['feel',{en:'Feel',vi:'Cảm nhận (Feel)'}],['do',{en:'Do',vi:'Làm (Do)'}],['read',{en:'Read',vi:'Đọc (Read)'}]],
+     [['assumed',{en:'Assumed value',vi:'Mặc nhiên tin (Assumed value)'}],['never',{en:'Never certain',vi:'Không bao giờ chắc chắn (Never certain)'}],['times',{en:'Number of times',vi:'Số lần (Number of times)'}],['period',{en:'Period of time',vi:'Khoảng thời gian (Period of time)'}]]
+   ]}
+];
+
+const I18N={
+  en:{subtitle:'Motivational traits', client:'Client', date:'Date', coach:'Coach',
+      vwHint:'Value words: copy the client’s exact words, the ones they repeat or emphasise.',
+      colQ:'Questions & traits', colV:'Value words', vwPh:'Client’s exact words…',
+      foot:'Mark by how the client speaks, not by what they talk about. Last three items: observe throughout the session.'},
+  vi:{subtitle:'Đặc điểm động lực (Motivational Traits)', client:'Khách hàng', date:'Ngày', coach:'Người khai vấn',
+      vwHint:'Từ khoá giá trị (Value Words): chép nguyên văn từ khách hàng lặp lại, nhấn mạnh',
+      colQ:'Câu hỏi và đặc điểm', colV:'Từ khoá giá trị', vwPh:'Nguyên văn lời khách hàng…',
+      foot:'Đánh dấu theo cách khách hàng nói, không theo nội dung họ kể. Ba mục cuối: quan sát suốt buổi khai vấn.'}
+};
+
+LL.registry.register({
+  id:'metaprogs', version:1,
+  title:{en:'MetaProgs', vi:'MetaProgs'},
+  desc:{en:'Intake form: client’s meta programs', vi:'Phiếu khai vấn Meta Programs'},
+  icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
+  i18n:I18N,
+
+  createData(){
+    let client='';
+    try{ const S=LL.state, c=S.meta&&S.clients[S.meta.activeClientId]; client=(c&&c.name)||''; }catch(e){}
+    let date=''; try{ date=new Date().toLocaleDateString('en-CA'); }catch(e){}   // YYYY-MM-DD for <input type=date>
+    return {client, date, coach:'', picks:{}, words:{}};
+  },
+
+  render(container, data, ctx){
+    const el=LL.util.el, lang=ctx.lang==='vi'?'vi':'en', L=I18N[lang];
+    data.picks=data.picks||{}; data.words=data.words||{};
+    const root=el('div',{class:'mp'});
+
+    // header fields
+    const field=(key,label,type)=>el('label',{class:'mp-f'},el('span',{},label),
+      el('input',{type:type||'text',class:'mp-in',value:data[key]||'',oninput(e){data[key]=e.target.value;ctx.update();}}));
+    root.appendChild(el('div',{class:'mp-sub'},L.subtitle));
+    root.appendChild(el('div',{class:'mp-head'},field('client',L.client),field('date',L.date,'date'),field('coach',L.coach)));
+
+    // table
+    const table=el('div',{class:'mp-table'});
+    table.appendChild(el('div',{class:'mp-hint'},L.vwHint));
+    table.appendChild(el('div',{class:'mp-row mp-th'},el('div',{},L.colQ),el('div',{},L.colV)));
+    TRAITS.forEach(tr=>{
+      const picks=data.picks[tr.k]||(data.picks[tr.k]=[]);
+      const left=el('div',{class:'mp-q'});
+      if(tr.q) left.appendChild(el('div',{class:'mp-question'},tr.q[lang]));
+      left.appendChild(el('div',{class:'mp-trait'},tr.t[lang]));
+      const groups=el('div',{class:'mp-groups'});
+      tr.opts.forEach(group=>{
+        const g=el('div',{class:'mp-opts'});
+        group.forEach(([key,lab])=>{
+          const cb=el('input',{type:'checkbox',onchange(e){
+            const i=picks.indexOf(key); if(e.target.checked&&i<0)picks.push(key); if(!e.target.checked&&i>=0)picks.splice(i,1);
+            ctx.update(); }});
+          cb.checked=picks.includes(key);
+          g.appendChild(el('label',{class:'mp-opt'},cb,el('span',{},lab[lang])));
+        });
+        groups.appendChild(g);
+      });
+      left.appendChild(groups);
+      const ta=el('textarea',{class:'llnote mp-words',placeholder:L.vwPh,'aria-label':L.colV+' · '+tr.t[lang],
+        oninput(e){data.words[tr.k]=e.target.value;ctx.update();}});
+      ta.value=data.words[tr.k]||'';
+      table.appendChild(el('div',{class:'mp-row'},left,el('div',{class:'mp-v'},ta)));
+    });
+    root.appendChild(table);
+    root.appendChild(el('p',{class:'mp-foot'},L.foot));
+    container.appendChild(root);
+  },
+
+  css:`
+  .mp{display:flex;flex-direction:column;gap:12px;}
+  .mp-sub{font-size:12px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--ink-faint);}
+  .mp-head{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,2fr);gap:10px;}
+  .mp-f{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--ink-soft);}
+  .mp-in{height:38px;border:1px solid var(--line);border-radius:10px;padding:0 11px;font:inherit;font-size:14px;font-weight:400;color:var(--ink);background:var(--surface-2);min-width:0;width:100%;box-sizing:border-box;}
+  .mp-in:focus{outline:none;border-color:var(--primary);background:var(--surface);}
+  .mp-table{border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .mp-hint{padding:9px 14px;font-size:13px;font-style:italic;color:var(--ink-soft);border-bottom:1px solid var(--line);text-align:center;}
+  .mp-row{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);border-bottom:1px solid var(--line);}
+  .mp-row:last-child{border-bottom:none;}
+  .mp-row>div{padding:12px 14px;min-width:0;}
+  .mp-row>div+div{border-left:1px solid var(--line);}
+  .mp-th{background:var(--primary-soft);font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--primary-deep);}
+  .mp-th>div{padding:9px 14px;}
+  .mp-question{font-weight:600;font-size:14.5px;line-height:1.4;margin-bottom:4px;}
+  .mp-trait{font-weight:700;font-size:13px;color:var(--primary);margin-bottom:6px;}
+  .mp-groups{display:flex;flex-wrap:wrap;gap:4px 28px;}
+  .mp-opts{display:flex;flex-direction:column;gap:2px;}
+  .mp-opt{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;padding:3px 0;}
+  .mp-opt input{width:17px;height:17px;accent-color:var(--primary);flex:0 0 auto;margin:0;cursor:pointer;}
+  .mp-v{display:flex;}
+  .mp-words{min-height:84px;height:100%;}
+  .mp-foot{font-size:12.5px;font-style:italic;color:var(--ink-soft);}
+  body.calm .mp-in{background:rgba(20,10,38,.5);}
+  body.calm .mp-th{background:rgba(124,92,255,.16);color:inherit;}
+  @media (max-width:680px){
+    .mp-head{grid-template-columns:minmax(0,1fr) minmax(0,1fr);} .mp-head .mp-f:first-child{grid-column:1/-1;}
+    .mp-row{grid-template-columns:1fr;} .mp-row>div+div{border-left:none;padding-top:0;}
+    .mp-th>div+div{display:none;}
+  }
+  `
+});
+})();
+
+
 /* ===== exercise: prioritization-wheel.js ===== */
 /* Prioritization Wheel — isolated extension (v2).
    Ported from the standalone tool: shared categories (add/remove, min 3),
@@ -1471,7 +1609,7 @@ function wrapLabel(s,maxChars){
 
 LL.registry.register({
   id:'prioritization-wheel', version:2, hideHead:true,
-  title:{en:'PW', vi:'PW'},
+  title:{en:'P&P wheels', vi:'P&P wheels'},
   desc:{en:'Rate & compare life/work areas', vi:'Đánh giá & so sánh lĩnh vực'},
   icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 4"/></svg>',
   i18n:PW,
