@@ -637,7 +637,9 @@ const I = LL.i18n = {
   set(l){ I.lang=l; if(LL.state.meta){LL.state.meta.lang=l; LL.db.put('meta',Object.assign({key:'app'},LL.state.meta));}
     document.getElementById('langEN').classList.toggle('on',l==='en');
     document.getElementById('langVI').classList.toggle('on',l==='vi');
-    I.apply(); LL.blocks.render(); LL.library.render(); LL.registry.renderPickers(); LL.ui.renderCGV();},
+    // apply() resets every [data-i18n] element, including the client chip's "No client" placeholder,
+    // so redraw the header afterwards to put the real client name back.
+    I.apply(); LL.ui.renderHeader(); LL.blocks.render(); LL.library.render(); LL.registry.renderPickers(); LL.ui.renderCGV();},
   apply(){ document.querySelectorAll('[data-i18n]').forEach(e=>{const v=I.t(e.getAttribute('data-i18n')); if(typeof v==='string')e.textContent=v;});
     document.documentElement.lang=I.lang; if(LL.ui&&LL.ui.renderBrand)LL.ui.renderBrand(); }
 };
