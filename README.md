@@ -27,6 +27,11 @@ only ever sees what's actually committed, which is the safe boundary.
 - `services.html` — Services (life coaching + business/executive coaching)
 - `blog.html` — Blogs
 - `contact.html` — Contact form, submits via Web3Forms (see below)
+- `corner/index.html` — Hai Pham's Corner, the in-session coaching tool. Deliberately not
+  linked from the menu and marked `noindex`; open it at `/corner/`. It is a build output:
+  don't edit it here. Its source lives in the separate `lifelab-coach` folder; run
+  `npm run website` there to rebuild and copy it in. Client notes stay in the browser's
+  localStorage and are never sent anywhere.
 
 ## Getting Started
 
