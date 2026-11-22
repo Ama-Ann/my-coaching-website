@@ -379,8 +379,11 @@ body.present .present-bar{display:flex;}
 @media (max-width:1280px){ .canvas{width:92%;} }
 @media (max-width:1200px){
   .canvas{width:94%;} .brand small{display:none;}
+  /* topbar gets crowded below ~1200px (Home button + brand + controls): icon-only buttons */
+  .tbtn span[data-i18n]{display:none;} .tbtn{padding:0 11px;} .saved span{display:none;}
 }
-@media (max-width:980px){ .tbtn span[data-i18n]{display:none;} .tbtn{padding:0 11px;} .timer .preset{display:none;} .saved span{display:none;} .sessionchip{max-width:170px;} }
+@media (max-width:980px){ .timer .preset{display:none;} .sessionchip{max-width:170px;} }
+@media (max-width:900px){ .brandtxt{display:none;} }
 @media (max-width:860px){
   :root{--rail-w:54px;}
   .canvas{width:96%;padding:16px 16px 120px;} .topbar{gap:8px;padding:0 12px;}
@@ -392,6 +395,11 @@ body.present .present-bar{display:flex;}
   /* phones: the Home button already sits top-left; drop the logo and the screen-sharing buttons so the bar fits */
   .topbar .brand,#presentBtn,.topbar [title="Fullscreen"]{display:none;} }
 .brandtxt #brandName{white-space:nowrap;}
+/* Controls keep their size; only the brand name gives way (truncates) if the bar is still too tight. */
+.topbar>*{flex-shrink:0;} .topbar>.spacer{flex-shrink:1;}
+.topbar>.brand{flex-shrink:1;min-width:0;} .brandtxt{min-width:0;overflow:hidden;}
+.topbar>.sessionchip{flex-shrink:1;min-width:0;} .sessionchip .sc-meta{min-width:0;overflow:hidden;}
+.brandtxt #brandName{display:block;overflow:hidden;text-overflow:ellipsis;}
 
 </style>
 </head>
