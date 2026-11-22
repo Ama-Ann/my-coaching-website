@@ -198,6 +198,26 @@ body.spotting .block.spot:has(.lp-tl){max-width:96vw;width:96vw;margin-left:calc
 .scale .dot{width:30px;height:30px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--ink-faint);transition:.12s var(--ease);cursor:pointer;}
 .scale .dot:hover{border-color:var(--sc-color);transform:translateY(-1px);}
 .scale .dot.fill{background:var(--sc-color);border-color:var(--sc-color);color:#fff;}
+/* Scaling arrow: left→right arrow with 10 points; filled up to the chosen value, bubble on the chosen point */
+.scaling .sc-row .sc-arrow{flex:1;min-width:0;}
+.sc-arrow{position:relative;padding:34px 40px 30px 22px;border-radius:12px;outline:none;--sc-rail:#CFC6B5;--sc-lead:16px;}
+.sc-arrow:focus-visible{box-shadow:0 0 0 3px var(--primary-soft);}
+.sc-track{position:relative;height:4px;}
+.sc-line{position:absolute;left:calc(-1 * var(--sc-lead));right:-30px;top:0;height:4px;border-radius:2px;background:var(--sc-rail);}
+.sc-line::after{content:"";position:absolute;right:-12px;top:50%;transform:translateY(-50%);border-left:14px solid var(--sc-rail);border-top:8px solid transparent;border-bottom:8px solid transparent;}
+.sc-fill{position:absolute;left:calc(-1 * var(--sc-lead));top:0;height:4px;border-radius:2px;background:var(--sc-color);transition:width .2s var(--ease);}
+.sc-pt{position:absolute;top:2px;width:16px;height:16px;padding:0;border-radius:50%;transform:translate(-50%,-50%);background:var(--surface);border:2px solid var(--sc-rail);cursor:pointer;transition:width .15s var(--ease),height .15s var(--ease),background .15s,border-color .15s;}
+.sc-pt::before{content:"";position:absolute;inset:-10px;border-radius:50%;}   /* bigger click target */
+.sc-pt:hover{border-color:var(--sc-color);}
+.sc-pt.on{background:var(--sc-color);border-color:var(--sc-color);}
+.sc-pt.sel{width:24px;height:24px;box-shadow:0 0 0 5px color-mix(in srgb,var(--sc-color) 20%,transparent);}
+.sc-n{position:absolute;top:calc(100% + 7px);left:50%;transform:translateX(-50%);font-size:12.5px;font-weight:600;color:var(--ink-faint);font-variant-numeric:tabular-nums;pointer-events:none;}
+.sc-pt.sel .sc-n{color:var(--sc-color);font-weight:800;font-size:14px;}
+.sc-marker{position:absolute;bottom:18px;transform:translateX(-50%);min-width:28px;height:23px;padding:0 7px;border-radius:7px;background:var(--sc-color);color:#fff;font-weight:700;font-size:13.5px;display:grid;place-items:center;pointer-events:none;box-shadow:0 3px 8px rgba(0,0,0,.12);transition:left .2s var(--ease);}
+.sc-marker::after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);border-top:6px solid var(--sc-color);border-left:6px solid transparent;border-right:6px solid transparent;}
+body.calm .sc-arrow{--sc-rail:#3E5E60;}
+@media (max-width:680px){ .sc-arrow{padding:32px 30px 28px 16px;} .sc-pt{width:12px;height:12px;} .sc-pt.sel{width:18px;height:18px;box-shadow:0 0 0 3px color-mix(in srgb,var(--sc-color) 20%,transparent);}
+  .sc-n{font-size:11px;} .sc-pt.sel .sc-n{font-size:12.5px;} .sc-arrow{--sc-lead:12px;} }
 
 /* Vision */
 .vision{display:flex;gap:16px;align-items:stretch;}
@@ -949,7 +969,9 @@ LL.ui.bindCGV=function(){
   const tabsEl=document.getElementById('cgvTabs'), txt=document.getElementById('cgvText');
   tabsEl.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ if(!S.session)return;
     S.session.cgv.tab=b.dataset.tab; LL.ui.renderCGV(); LL.state.touch({silent:true}); }));
-  txt.addEventListener('input',()=>{ if(!S.session)return; S.session.cgv[S.session.cgv.tab]=txt.textContent;
+  // innerText (not textContent) keeps the line breaks typed into the contenteditable box,
+  // so multi-line Contract / Goal / Vision text survives into the takeaway
+  txt.addEventListener('input',()=>{ if(!S.session)return; S.session.cgv[S.session.cgv.tab]=txt.innerText.replace(/\n$/,'');
     txt.classList.toggle('empty',!txt.textContent.trim()); LL.state.touch({silent:true}); });
 };
 
@@ -996,9 +1018,26 @@ LL.blocks = (function(){
     const title=el('div',{class:'sc-title'+((block.title||'').trim()?'':' empty'),contenteditable:'true','data-ph':t('sc_title_ph'),
       oninput(e){block.title=e.target.textContent;e.target.classList.toggle('empty',!e.target.textContent.trim());LL.state.touch();}}); title.textContent=block.title||'';
     const now=el('div',{class:'sc-now'},el('b',{},block.value||'–'));
-    const scale=el('div',{class:'scale'});
-    for(let i=1;i<=10;i++){const d=el('div',{class:'dot'+((block.value&&i<=block.value)?' fill':''),onclick(){block.value=i;
-      scale.querySelectorAll('.dot').forEach((x,xi)=>x.classList.toggle('fill',xi<i)); now.querySelector('b').textContent=i; LL.state.touch();}},String(i));scale.appendChild(d);}
+    /* 1–10 arrow: a left→right arrow with ten points; the picked number is marked on the arrow
+       (filled from 1 up to the value, a bubble above the chosen point). Click a point, or use ←/→. */
+    const pos=i=>`calc(${(i-1)/9*100}%)`;
+    const fill=el('div',{class:'sc-fill'}), marker=el('div',{class:'sc-marker'});
+    const track=el('div',{class:'sc-track'},el('div',{class:'sc-line'}),fill);
+    const pts=[];
+    for(let i=1;i<=10;i++){ const p=el('button',{type:'button',class:'sc-pt',style:`left:${pos(i)}`,'aria-label':String(i),tabindex:'-1',
+      onclick(){ setVal(i); }},el('span',{class:'sc-n'},String(i))); pts.push(p); track.appendChild(p); }
+    track.appendChild(marker);
+    const scale=el('div',{class:'sc-arrow',role:'slider',tabindex:'0','aria-valuemin':'1','aria-valuemax':'10','aria-label':t('bt_scaling'),
+      onkeydown(e){ const v=block.value||0;
+        if(e.key==='ArrowRight'||e.key==='ArrowUp'){ e.preventDefault(); setVal(Math.min(10,v+1)); }
+        else if(e.key==='ArrowLeft'||e.key==='ArrowDown'){ e.preventDefault(); setVal(Math.max(1,v-1||1)); } }},track);
+    function paint(){ const v=block.value;
+      pts.forEach((p,k)=>{ p.classList.toggle('on',!!v&&k+1<=v); p.classList.toggle('sel',v===k+1); });
+      fill.style.display=v?'':'none'; if(v) fill.style.width=`calc(${(v-1)/9*100}% + var(--sc-lead))`;   // the line starts --sc-lead left of point 1
+      marker.style.display=v?'':'none'; if(v){ marker.style.left=pos(v); marker.textContent=v; }
+      scale.setAttribute('aria-valuenow',v||''); now.querySelector('b').textContent=v||'–'; }
+    function setVal(i){ block.value=i; paint(); LL.state.touch(); }
+    paint();
     const body=el('div',{class:'scaling'},el('div',{class:'sc-row'},scale,now));
     if(block.color) body.style.setProperty('--sc-color',block.color);
     /* per-block accent picker (shared primitive): a colour swatch next to the title,
@@ -1196,7 +1235,19 @@ LL.export=(function(){
     for(const b of s.blocks){ if(b.type==='vision'&&b.imageId&&!map[b.imageId]){
       try{ const im=await db.get('images',b.imageId); if(im&&im.dataUrl)map[b.imageId]=im.dataUrl; }catch(e){} } }
     return map; }
-  function scaleBar(v){ let h=''; for(let i=1;i<=10;i++)h+=`<span class="seg${i<=v?' on':''}"></span>`; return `<div class="scalebar">${h}</div>`; }
+  /* the same 1–10 arrow as on screen, as SVG: grey arrow, coloured up to the value, bubble on the chosen point */
+  function scaleBar(v,color){ const c=color||'#2C5054', rail='#CFC6B5', X0=40, X1=640, x=i=>X0+(i-1)*(X1-X0)/9, Y=46;
+    let s=`<svg class="scalearrow" viewBox="0 0 700 92" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;font-family:inherit">`;
+    s+=`<line x1="${X0-18}" y1="${Y}" x2="${X1+40}" y2="${Y}" stroke="${rail}" stroke-width="4" stroke-linecap="round"/>`;
+    s+=`<polygon points="${X1+56},${Y} ${X1+40},${Y-9} ${X1+40},${Y+9}" fill="${rail}"/>`;
+    if(v) s+=`<line x1="${X0-18}" y1="${Y}" x2="${x(v)}" y2="${Y}" stroke="${c}" stroke-width="4" stroke-linecap="round"/>`;
+    for(let i=1;i<=10;i++){ const on=v&&i<=v, sel=v===i;
+      s+=`<circle cx="${x(i)}" cy="${Y}" r="${sel?12:8}" fill="${on?c:'#fff'}" stroke="${on?c:rail}" stroke-width="2.5"/>`;
+      s+=`<text x="${x(i)}" y="${Y+32}" text-anchor="middle" font-size="${sel?16:14}" font-weight="${sel?800:600}" fill="${sel?c:'#A39A8C'}">${i}</text>`; }
+    if(v){ const cx=x(v); s+=`<rect x="${cx-17}" y="${Y-46}" width="34" height="24" rx="7" fill="${c}"/>`
+      +`<polygon points="${cx-6},${Y-22} ${cx+6},${Y-22} ${cx},${Y-16}" fill="${c}"/>`
+      +`<text x="${cx}" y="${Y-28.5}" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">${v}</text>`; }
+    return s+'</svg>'; }
 
   function buildInner(imgs){
     const s=S.session; const c=S.clients[s.clientId]; const lang=LL.i18n.lang; const tk=s.takeaway||{};
@@ -1206,14 +1257,16 @@ LL.export=(function(){
     const actions=[];
     for(const b of s.blocks){
       if(b.type==='note'&&(b.html||'').trim()) parts.push(`<section class="blk"><div class="note">${b.html}</div></section>`);
-      else if(b.type==='scaling'&&b.value!=null) parts.push(`<section class="blk scale"><div class="scale-row"><span class="snum">${b.value}</span><span class="stitle">${esc(b.title||'')}</span></div>${scaleBar(b.value)}</section>`);
-      else if(b.type==='vision'){ const meta=esc(b.metaphor||''),note=esc(b.note||''); const img=b.imageId&&imgs[b.imageId];
+      else if(b.type==='scaling'&&(b.value!=null||(b.title||'').trim())) parts.push(`<section class="blk scale"><div class="scale-row"><span class="snum">${b.value!=null?b.value:'–'}</span><span class="stitle">${esc(b.title||'')}</span></div>${scaleBar(b.value||0,b.color)}</section>`);
+      else if(b.type==='vision'){ const meta=esc(b.metaphor||''),note=esc(b.note||'').replace(/\n/g,'<br>'); const img=b.imageId&&imgs[b.imageId];
         if(meta||note||img){ let h=`<section class="blk vision"><h2>${esc(t('wg_vision'))}</h2>`;
           if(img)h+=`<div class="vimg"><img src="${img}" alt=""></div>`;
           if(meta)h+=`<p class="metaphor">“${meta}”</p>`;
           if(note)h+=`<p>${note}</p>`; parts.push(h+'</section>'); } }
       else if(b.type==='exercise'){ const def=LL.registry.get(b.exerciseId);
-        if(def&&def.exportSummary){ try{ parts.push('<section class="blk ex">'+def.exportSummary(b.data,lang)+'</section>'); }catch(e){} }
+        if(def&&def.exportSummary){ try{ const h=def.exportSummary(b.data||{},lang); if(h&&h.trim())parts.push('<section class="blk ex">'+h+'</section>'); }
+          catch(e){ console.warn('takeaway: '+b.exerciseId+' export failed',e);
+            parts.push(`<section class="blk ex"><h2>${esc((def.title&&(def.title[lang]||def.title.en))||b.exerciseId)}</h2><p style="color:#A39A8C">(could not be included)</p></section>`); } }
         if(b.data&&Array.isArray(b.data.actions))actions.push(...b.data.actions.filter(x=>x&&x.trim()));
         if(b.data&&Array.isArray(b.data.arrows))actions.push(...b.data.arrows.filter(x=>x&&x.trim())); }
     }
@@ -1221,7 +1274,10 @@ LL.export=(function(){
     if((tk.wins||'').trim())parts.push(`<section class="blk wins-sec"><h2>${esc(t('take_wins'))}</h2><p>${esc(tk.wins).replace(/\n/g,'<br>')}</p></section>`);
     if((tk.appreciation||'').trim())parts.push(`<section class="blk appr"><div class="appr-card"><div class="appr-h">${esc(t('appreciation'))}</div><p>${esc(tk.appreciation).replace(/\n/g,'<br>')}</p></div></section>`);
     const date=fmtFull(s.createdAt);
-    const head=`<header><div class="logo">L</div><div class="htxt"><h1>${esc(s.title||t('untitled'))}</h1>`
+    // brand logo (from Settings / default) instead of the old hard-coded "L"; falls back to the brand's initial
+    const blogo=LL.ui.brandLogo(), bname=LL.ui.brandName();
+    const logoHtml=blogo?`<div class="logo img"><img src="${blogo}" alt=""></div>`:`<div class="logo">${esc((bname||'H').trim().charAt(0).toUpperCase())}</div>`;
+    const head=`<header>${logoHtml}<div class="htxt"><h1>${esc(s.title||t('untitled'))}</h1>`
       +`<div class="sub">${esc(t('summary_for'))} <b>${esc(c?c.name:'')}</b> · ${esc(t('by_coach'))}</div>`
       +`<div class="date">${esc(date)}</div></div></header>`;
     const foot=`<footer>${esc(LL.ui.brandName())} · ${esc(date)}</footer>`;
@@ -1234,6 +1290,7 @@ LL.export=(function(){
   +".take-doc .wrap{max-width:720px;margin:0 auto;background:#fff;border:1px solid #ECE3D4;border-radius:20px;padding:40px 44px;box-shadow:0 12px 40px rgba(40,32,20,.07);}"
   +".take-doc header{display:flex;gap:16px;align-items:flex-start;border-bottom:2px solid #F0E9DC;padding-bottom:22px;margin-bottom:6px;}"
   +".take-doc .logo{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#C98A4B,#1f3a3d);color:#fff;display:grid;place-items:center;font-weight:700;font-size:22px;flex:0 0 auto;}"
+  +".take-doc .logo.img{background:#fff;border:1px solid #ECE3D4;overflow:hidden;} .take-doc .logo.img img{width:100%;height:100%;object-fit:cover;display:block;}"
   +".take-doc .htxt{flex:1;min-width:0;} .take-doc h1{font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:27px;line-height:1.18;margin:0 0 4px;font-weight:700;letter-spacing:-.2px;}"
   +".take-doc .sub{color:#6E665B;font-size:13.5px;} .take-doc .sub b{color:#4A4036;font-weight:600;}"
   +".take-doc .date{color:#A39A8C;font-size:12px;margin-top:7px;text-transform:uppercase;letter-spacing:.6px;}"
@@ -1426,7 +1483,7 @@ window.LL = LL;
 /* MetaProgs — intake form for profiling a client's meta programs (motivational traits).
    Filled in by the coach during the first session. Layout follows the Word form
    "Phiếu khai vấn Meta Programs"; English wording follows "Determining a client's metaprograms".
-   Coach-only: no exportSummary, so it never appears in the client takeaway. */
+   Included in the client takeaway like every other block (header fields, ticked options, value words). */
 (function(){
 // Each trait: optional question, trait label, option groups (convincers has two side-by-side groups).
 const TRAITS=[
@@ -1522,6 +1579,31 @@ LL.registry.register({
     root.appendChild(table);
     root.appendChild(el('p',{class:'mp-foot'},L.foot));
     container.appendChild(root);
+  },
+
+  exportSummary(data, lang){
+    const esc=LL.util.esc, lg=lang==='vi'?'vi':'en', L=I18N[lg];
+    const picks=data.picks||{}, words=data.words||{};
+    const head=[[L.client,data.client],[L.date,data.date],[L.coach,data.coach]].filter(([,v])=>(v||'').trim());
+    const rows=TRAITS.map(tr=>{
+      const sel=[].concat(...tr.opts).filter(([k])=>(picks[tr.k]||[]).includes(k)).map(([,lab])=>lab[lg]);
+      const vw=(words[tr.k]||'').trim();
+      return {tr,sel,vw};
+    });
+    if(!head.length&&!rows.some(r=>r.sel.length||r.vw)) return '';
+    let h='<h2>MetaProgs</h2>';
+    if(head.length) h+='<p>'+head.map(([k,v])=>'<b>'+esc(k)+':</b> '+esc(v)).join(' · ')+'</p>';
+    h+='<table style="width:100%;border-collapse:collapse;margin:8px 0;font-size:14px">'
+      +'<thead><tr><th style="text-align:left;padding:6px 8px;border-bottom:2px solid #E6EFEE">'+esc(L.colQ)+'</th>'
+      +'<th style="text-align:left;padding:6px 8px;border-bottom:2px solid #E6EFEE">'+esc(L.colV)+'</th></tr></thead><tbody>';
+    rows.forEach(({tr,sel,vw})=>{
+      h+='<tr><td style="vertical-align:top;padding:7px 8px;border-bottom:1px solid #F4EFE6">'
+        +(tr.q?'<div style="font-size:13px;color:#6E665B">'+esc(tr.q[lg])+'</div>':'')
+        +'<div style="font-weight:700;color:#2C5054">'+esc(tr.t[lg])+'</div>'
+        +'<div>'+(sel.length?sel.map(s=>'☑ '+esc(s)).join('<br>'):'<span style="color:#A39A8C">—</span>')+'</div></td>'
+        +'<td style="vertical-align:top;padding:7px 8px;border-bottom:1px solid #F4EFE6">'+(vw?esc(vw).replace(/\n/g,'<br>'):'')+'</td></tr>';
+    });
+    return h+'</tbody></table>';
   },
 
   css:`
@@ -1623,6 +1705,68 @@ function wrapLabel(s,maxChars){
   return lines;
 }
 
+/* ---------- wheel SVG (string) — module level so the takeaway export can draw it too ---------- */
+    function wheelSvgFor(data,wi,IID){
+      const esc=LL.util.esc, stars=data.stars||[];
+      const catColor=i=>(data.catColors&&data.catColors[i])||scol(i);
+      const filled=()=>(data.categories||[]).map((c,i)=>({name:(c||'').trim(),i})).filter(c=>c.name);
+      const isScaled=()=>(data.wheels||[]).length>1, geom=()=>isScaled()?GEOM.scaled:GEOM.full;
+      const cats=filled(), N=cats.length, ratings=(data.wheels[wi]&&data.wheels[wi].ratings)||[];
+      const g=geom(), VIEW=g.VIEW, C=VIEW/2, R=g.R, GAP=g.GAP, PADX=g.PADX, PADY=g.PADY, LINE_H=g.LINE_H, MAX=g.MAX_CHARS;
+      const sa=(2*Math.PI)/N, angleAt=i=>-Math.PI/2+i*sa;
+      /* radial gradient per sector: lightest tint at centre → full category shade at the rim */
+      let defs=`<defs><filter id="${IID}-glow-${wi}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+      for(let i=0;i<N;i++){ const col=catColor(cats[i].i);
+        defs+=`<radialGradient id="${IID}-g-${wi}-${cats[i].i}" gradientUnits="userSpaceOnUse" cx="${C}" cy="${C}" r="${R}">`
+          +`<stop offset="0" stop-color="${tint(col,0.80)}"/><stop offset="0.45" stop-color="${tint(col,0.34)}"/><stop offset="1" stop-color="${col}"/></radialGradient>`; }
+      defs+='</defs>';
+      let grid='';
+      for(let r=1;r<=10;r++){ const cls=(r===5||r===10)?'pw-grid major':'pw-grid';
+        grid+=`<circle class="${cls}" cx="${C}" cy="${C}" r="${(R*r)/10}"/>`; }
+      /* framing rim around the outer edge for a crisp, finished boundary */
+      grid+=`<circle class="pw-rim" cx="${C}" cy="${C}" r="${R}"/>`;
+      let axes='';
+      for(let i=0;i<N;i++){ const a=angleAt(i);
+        axes+=`<line class="pw-axis" x1="${C}" y1="${C}" x2="${C+R*Math.cos(a)}" y2="${C+R*Math.sin(a)}"/>`; }
+      let hits='';
+      for(let i=0;i<N;i++){ const a0=angleAt(i),a1=angleAt(i+1);
+        const x0=C+R*Math.cos(a0),y0=C+R*Math.sin(a0),x1=C+R*Math.cos(a1),y1=C+R*Math.sin(a1);
+        hits+=`<path class="pw-bg" data-sector="${cats[i].i}" data-wi="${wi}" d="M ${C} ${C} L ${x0} ${y0} A ${R} ${R} 0 0 1 ${x1} ${y1} Z"></path>`; }
+      let fills='';
+      for(let i=0;i<N;i++){ const score=ratings[cats[i].i];
+        if(score!=null&&score>0){ const a0=angleAt(i),a1=angleAt(i+1),r=(score/10)*R;
+          const x0=C+r*Math.cos(a0),y0=C+r*Math.sin(a0),x1=C+r*Math.cos(a1),y1=C+r*Math.sin(a1);
+          fills+=`<path class="pw-fill" fill="url(#${IID}-g-${wi}-${cats[i].i})" d="M ${C} ${C} L ${x0} ${y0} A ${r} ${r} 0 0 1 ${x1} ${y1} Z"></path>`; } }
+      /* keystone spotlight: translucent gold wash over the wedge + glowing rim arc */
+      let starfx='';
+      for(let i=0;i<N;i++){ if(!stars[cats[i].i]) continue;
+        const a0=angleAt(i),a1=angleAt(i+1);
+        const x0=C+R*Math.cos(a0),y0=C+R*Math.sin(a0),x1=C+R*Math.cos(a1),y1=C+R*Math.sin(a1);
+        starfx+=`<path class="pw-starwash" d="M ${C} ${C} L ${x0} ${y0} A ${R} ${R} 0 0 1 ${x1} ${y1} Z"></path>`;
+        starfx+=`<path class="pw-starrim" filter="url(#${IID}-glow-${wi})" fill="none" d="M ${x0} ${y0} A ${R} ${R} 0 0 1 ${x1} ${y1}"></path>`; }
+      let scores='';
+      const so=g.SCORE_OFFSET;
+      for(let i=0;i<N;i++){ const score=ratings[cats[i].i];
+        if(score!=null&&score>0){ const midA=angleAt(i)+sa/2, r=Math.max((score/10)*R-so,so+6);
+          const sx=C+r*Math.cos(midA), sy=C+r*Math.sin(midA);
+          scores+=`<circle class="pw-scorebg" cx="${sx}" cy="${sy}" r="${g.SCORE_R}"/>`;
+          scores+=`<text class="pw-score" x="${sx}" y="${sy}" dy="0.35em">${score}</text>`; } }
+      /* center hub: tidies the point where all wedges meet */
+      const hub=`<circle class="pw-hub" cx="${C}" cy="${C}" r="${g.HUB}"/><circle class="pw-hub-dot" cx="${C}" cy="${C}" r="${g.HUB*0.32}"/>`;
+      let labels='';
+      for(let i=0;i<N;i++){ const midA=angleAt(i)+sa/2, cos=Math.cos(midA), sin=Math.sin(midA);
+        const starred=!!stars[cats[i].i];
+        const lines=wrapLabel(cats[i].name,MAX), lc=lines.length;
+        const anchor=cos>0.35?'start':(cos<-0.35?'end':'middle');
+        const lx=C+(R+GAP)*cos, yRef=C+(R+GAP)*sin;
+        let ly0; if(sin<-0.35)ly0=yRef-(lc-1)*LINE_H; else if(sin>0.35)ly0=yRef; else ly0=yRef-(lc-1)/2*LINE_H;
+        let tb=''; lines.forEach((ln,li)=>{ const pre=(li===0&&starred)?'<tspan class="pw-kprefix">★ </tspan>':''; tb+=`<tspan x="${lx}" y="${ly0+li*LINE_H}">${pre}${esc(ln)}</tspan>`; });
+        labels+=`<text class="pw-label" text-anchor="${anchor}" dominant-baseline="middle">${tb}</text>`; }
+      const VBW=VIEW+PADX*2, VBH=VIEW+PADY*2;
+      return `<svg class="pw-svg${isScaled()?' scaled':''}" viewBox="${-PADX} ${-PADY} ${VBW} ${VBH}" xmlns="http://www.w3.org/2000/svg">${defs}${grid}${axes}${fills}${starfx}${hits}${hub}${scores}${labels}</svg>`;
+    }
+
+
 LL.registry.register({
   id:'prioritization-wheel', version:2, hideHead:true,
   title:{en:'P&P wheels', vi:'P&P wheels'},
@@ -1653,62 +1797,7 @@ LL.registry.register({
     const isScaled=()=>data.wheels.length>1;
     const geom=()=>isScaled()?GEOM.scaled:GEOM.full;
 
-    /* ---------- wheel SVG (string) ---------- */
-    function wheelSvg(wi){
-      const cats=filled(), N=cats.length, ratings=data.wheels[wi].ratings;
-      const g=geom(), VIEW=g.VIEW, C=VIEW/2, R=g.R, GAP=g.GAP, PADX=g.PADX, PADY=g.PADY, LINE_H=g.LINE_H, MAX=g.MAX_CHARS;
-      const sa=(2*Math.PI)/N, angleAt=i=>-Math.PI/2+i*sa;
-      /* radial gradient per sector: lightest tint at centre → full category shade at the rim */
-      let defs=`<defs><filter id="${IID}-glow-${wi}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
-      for(let i=0;i<N;i++){ const col=catColor(cats[i].i);
-        defs+=`<radialGradient id="${IID}-g-${wi}-${cats[i].i}" gradientUnits="userSpaceOnUse" cx="${C}" cy="${C}" r="${R}">`
-          +`<stop offset="0" stop-color="${tint(col,0.80)}"/><stop offset="0.45" stop-color="${tint(col,0.34)}"/><stop offset="1" stop-color="${col}"/></radialGradient>`; }
-      defs+='</defs>';
-      let grid='';
-      for(let r=1;r<=10;r++){ const cls=(r===5||r===10)?'pw-grid major':'pw-grid';
-        grid+=`<circle class="${cls}" cx="${C}" cy="${C}" r="${(R*r)/10}"/>`; }
-      /* framing rim around the outer edge for a crisp, finished boundary */
-      grid+=`<circle class="pw-rim" cx="${C}" cy="${C}" r="${R}"/>`;
-      let axes='';
-      for(let i=0;i<N;i++){ const a=angleAt(i);
-        axes+=`<line class="pw-axis" x1="${C}" y1="${C}" x2="${C+R*Math.cos(a)}" y2="${C+R*Math.sin(a)}"/>`; }
-      let hits='';
-      for(let i=0;i<N;i++){ const a0=angleAt(i),a1=angleAt(i+1);
-        const x0=C+R*Math.cos(a0),y0=C+R*Math.sin(a0),x1=C+R*Math.cos(a1),y1=C+R*Math.sin(a1);
-        hits+=`<path class="pw-bg" data-sector="${cats[i].i}" data-wi="${wi}" d="M ${C} ${C} L ${x0} ${y0} A ${R} ${R} 0 0 1 ${x1} ${y1} Z"></path>`; }
-      let fills='';
-      for(let i=0;i<N;i++){ const score=ratings[cats[i].i];
-        if(score!=null&&score>0){ const a0=angleAt(i),a1=angleAt(i+1),r=(score/10)*R;
-          const x0=C+r*Math.cos(a0),y0=C+r*Math.sin(a0),x1=C+r*Math.cos(a1),y1=C+r*Math.sin(a1);
-          fills+=`<path class="pw-fill" fill="url(#${IID}-g-${wi}-${cats[i].i})" d="M ${C} ${C} L ${x0} ${y0} A ${r} ${r} 0 0 1 ${x1} ${y1} Z"></path>`; } }
-      /* keystone spotlight: translucent gold wash over the wedge + glowing rim arc */
-      let starfx='';
-      for(let i=0;i<N;i++){ if(!data.stars[cats[i].i]) continue;
-        const a0=angleAt(i),a1=angleAt(i+1);
-        const x0=C+R*Math.cos(a0),y0=C+R*Math.sin(a0),x1=C+R*Math.cos(a1),y1=C+R*Math.sin(a1);
-        starfx+=`<path class="pw-starwash" d="M ${C} ${C} L ${x0} ${y0} A ${R} ${R} 0 0 1 ${x1} ${y1} Z"></path>`;
-        starfx+=`<path class="pw-starrim" filter="url(#${IID}-glow-${wi})" fill="none" d="M ${x0} ${y0} A ${R} ${R} 0 0 1 ${x1} ${y1}"></path>`; }
-      let scores='';
-      const so=g.SCORE_OFFSET;
-      for(let i=0;i<N;i++){ const score=ratings[cats[i].i];
-        if(score!=null&&score>0){ const midA=angleAt(i)+sa/2, r=Math.max((score/10)*R-so,so+6);
-          const sx=C+r*Math.cos(midA), sy=C+r*Math.sin(midA);
-          scores+=`<circle class="pw-scorebg" cx="${sx}" cy="${sy}" r="${g.SCORE_R}"/>`;
-          scores+=`<text class="pw-score" x="${sx}" y="${sy}" dy="0.35em">${score}</text>`; } }
-      /* center hub: tidies the point where all wedges meet */
-      const hub=`<circle class="pw-hub" cx="${C}" cy="${C}" r="${g.HUB}"/><circle class="pw-hub-dot" cx="${C}" cy="${C}" r="${g.HUB*0.32}"/>`;
-      let labels='';
-      for(let i=0;i<N;i++){ const midA=angleAt(i)+sa/2, cos=Math.cos(midA), sin=Math.sin(midA);
-        const starred=!!data.stars[cats[i].i];
-        const lines=wrapLabel(cats[i].name,MAX), lc=lines.length;
-        const anchor=cos>0.35?'start':(cos<-0.35?'end':'middle');
-        const lx=C+(R+GAP)*cos, yRef=C+(R+GAP)*sin;
-        let ly0; if(sin<-0.35)ly0=yRef-(lc-1)*LINE_H; else if(sin>0.35)ly0=yRef; else ly0=yRef-(lc-1)/2*LINE_H;
-        let tb=''; lines.forEach((ln,li)=>{ const pre=(li===0&&starred)?'<tspan class="pw-kprefix">★ </tspan>':''; tb+=`<tspan x="${lx}" y="${ly0+li*LINE_H}">${pre}${esc(ln)}</tspan>`; });
-        labels+=`<text class="pw-label" text-anchor="${anchor}" dominant-baseline="middle">${tb}</text>`; }
-      const VBW=VIEW+PADX*2, VBH=VIEW+PADY*2;
-      return `<svg class="pw-svg${isScaled()?' scaled':''}" viewBox="${-PADX} ${-PADY} ${VBW} ${VBH}" xmlns="http://www.w3.org/2000/svg">${defs}${grid}${axes}${fills}${starfx}${hits}${hub}${scores}${labels}</svg>`;
-    }
+    const wheelSvg=wi=>wheelSvgFor(data,wi,IID);   // shared with exportSummary (client takeaway)
 
     /* ---------- DOM scaffold ---------- */
     const root=el('div',{class:'pw'});
@@ -1823,7 +1912,14 @@ LL.registry.register({
     const cc=i=>(data.catColors&&data.catColors[i])||scol(i);
     const cats=(data.categories||[]).map((c,i)=>({name:(c||'').trim(),i})).filter(c=>c.name);
     const wheels=data.wheels||[];
-    if(!cats.length||!wheels.length) return '';
+    const noteTxt0=(data.notes||'').replace(/<[^>]*>/g,'').trim(), theme=(data.theme||'').trim();
+    // nothing rated or named yet: still keep the theme / notes if the coach wrote any
+    if(!cats.length||!wheels.length){
+      if(!theme&&!noteTxt0) return '';
+      let h0='<h2>'+esc(L.sumTitle)+'</h2>';
+      if(theme) h0+='<p><b>'+esc(L.themeLabel)+':</b> '+esc(theme)+'</p>';
+      if(noteTxt0) h0+='<div class="note" style="margin-top:8px">'+((data.notes.indexOf('<')===-1)?esc(data.notes).replace(/\n/g,'<br>'):data.notes)+'</div>';
+      return h0; }
     const heads=wheels.map((w,i)=>`<th style="text-align:center">${esc(w.name||L.wheelDefault(i))}</th>`).join('');
     const isStar=i=>!!(data.stars&&data.stars[i]);
     const rows=cats.map(c=>{
@@ -1836,6 +1932,28 @@ LL.registry.register({
       const sum=vals.reduce((a,b)=>a+b,0); return {sum, avg:vals.length?(sum/vals.length).toFixed(1):'–'}; });
     const totalRow=`<tr style="font-weight:600;background:#F4F1EA"><td>Σ / Avg</td>${totals.map(tt=>`<td style="text-align:center">${tt.sum} / ${tt.avg}</td>`).join('')}</tr>`;
     let h='<h2>'+esc(L.sumTitle)+'</h2>';
+    if(theme) h+='<p><b>'+esc(L.themeLabel)+':</b> '+esc(theme)+'</p>';
+    // the wheel drawings themselves (same SVG as on screen), with print-safe light-theme styles inlined
+    const IID='pwx'+Math.random().toString(36).slice(2,8);
+    h+=`<style>.pwx{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:6px 0 10px;}
+      .pwx figure{margin:0;flex:1 1 200px;max-width:${wheels.length>1?330:440}px;text-align:center;}
+      .pwx figcaption{font-weight:700;font-size:13px;color:#2C5054;margin-bottom:2px;}
+      .pwx svg{width:100%;height:auto;}
+      .pwx .pw-grid{fill:none;stroke:#eae2d2;stroke-width:1;} .pwx .pw-grid.major{stroke:#d8cdb8;}
+      .pwx .pw-rim{fill:none;stroke:#cbbfa3;stroke-width:2.4;} .pwx .pw-axis{stroke:#dcd2bd;stroke-width:1.2;}
+      .pwx .pw-bg{fill:transparent;} .pwx .pw-fill{stroke:rgba(0,0,0,.16);stroke-width:1.2;}
+      .pwx .pw-hub{fill:#fff;stroke:#d4c9b2;stroke-width:1.5;} .pwx .pw-hub-dot{fill:#c7bb9f;}
+      .pwx .pw-scorebg{fill:rgba(255,255,255,.85);stroke:rgba(0,0,0,.07);stroke-width:1;}
+      .pwx .pw-label{font-size:26px;fill:#2A2723;font-weight:600;font-family:inherit;}
+      .pwx .pw-score{font-weight:700;font-size:24px;fill:#2A2723;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:2px;stroke-linejoin:round;}
+      .pwx .scaled .pw-label{font-size:38px;} .pwx .scaled .pw-score{font-size:30px;stroke-width:3px;}
+      .pwx .pw-starwash{fill:#D99B2B;opacity:.16;} .pwx .pw-starrim{fill:none;stroke:#D99B2B;stroke-width:6;stroke-linecap:round;}
+      .pwx .pw-kprefix{fill:#D99B2B;font-weight:800;}</style>`;
+    // on screen the compare-mode wheels carry tall top/bottom padding; trim it to ~110 units for paper
+    const tight=svg=>svg.replace(/viewBox="(\S+) (\S+) (\S+) (\S+)"/,(m,x,y,w,hh)=>{ const py=-parseFloat(y), pad=Math.min(py,110);
+      return `viewBox="${x} ${-pad} ${w} ${parseFloat(hh)-2*py+2*pad}"`; });
+    h+='<div class="pwx">'+wheels.map((w,i)=>'<figure>'+(wheels.length>1?'<figcaption>'+esc(w.name||L.wheelDefault(i))+'</figcaption>':'')
+      +tight(wheelSvgFor(data,i,IID))+'</figure>').join('')+'</div>';
     h+=`<table style="width:100%;border-collapse:collapse;margin:8px 0;font-size:14px">
       <thead><tr><th style="text-align:left">${esc(L.sumCategory)}</th>${heads}</tr></thead>
       <tbody>${rows}${totalRow}</tbody></table>`;
@@ -2379,8 +2497,34 @@ LL.registry.register({
     const fmt=d=>{ if(!d) return ''; const hasDay=d.length>=10, loc=lang==='vi'?'vi-VN':'en-GB';
       return new Date(hasDay?d:d+'-01').toLocaleDateString(loc, hasDay?{day:'numeric',month:'short',year:'numeric'}:{month:'short',year:'numeric'}); };
     const start=data.start||{}, goal=data.goal||{}, ms=data.milestones||[];
-    const anything=(start.label||'').trim()||(goal.label||'').trim()||ms.some(m=>(m.label||'').trim());
+    const has=o=>(o.label||'').trim()||o.date||(o.note||'').trim();
+    const anything=has(start)||has(goal)||ms.some(has)||(data.notes||'').trim();
     if(!anything) return '';
+    // the rail itself, drawn as SVG: Today on the left, goal ⭐ on the right, points placed by
+    // date when the goal has a date (same rule as on screen), otherwise evenly spaced
+    const railSvg=(()=>{
+      const dnum=d=>d?new Date(d.length>=10?d:d+'-01').getTime():null, TODAY=new Date().toISOString().slice(0,10);
+      const s0=dnum(TODAY), g0=dnum(goal.date), byDate=g0!=null&&g0>s0;
+      const items=[]; if(start.date&&start.date!==TODAY) items.push({o:start,fire:true});
+      ms.forEach(m=>{ if((m.label||'').trim()) items.push({o:m}); });
+      const fb=k=>items.length<=1?0.5:0.06+0.86*k/(items.length-1);
+      items.forEach((it,k)=>{ it.f=(byDate&&it.o.date)?Math.max(0.04,Math.min(0.97,(dnum(it.o.date)-s0)/(g0-s0))):fb(k); });
+      items.sort((a,b)=>a.f-b.f);
+      const X0=60,X1=640,Y=70, x=f=>X0+f*(X1-X0), rail=data.railColor||'#D99B2B', ink=data.textColor||'#2A2723';
+      const cut=s=>{ s=(s||'').trim(); return s.length>18?s.slice(0,17)+'…':s; };
+      const lbl=(cx,txt,dt,up)=>{ const y=up?Y-28:Y+38;
+        return `<text x="${cx}" y="${y}" text-anchor="middle" font-size="15" font-weight="600" fill="${ink}">${esc(cut(txt))}</text>`
+          +(dt?`<text x="${cx}" y="${y+(up?-17:17)}" text-anchor="middle" font-size="12.5" fill="#A39A8C">${esc(fmt(dt))}</text>`:''); };
+      let s=`<svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;margin:6px 0 10px;font-family:inherit">`;
+      s+=`<line x1="${X0}" y1="${Y}" x2="${X1}" y2="${Y}" stroke="${rail}" stroke-width="5" stroke-linecap="round"/>`;
+      s+=`<circle cx="${X0}" cy="${Y}" r="6" fill="#fff" stroke="${rail}" stroke-width="3"/>`+lbl(X0,L.today,TODAY,false);
+      items.forEach((it,k)=>{ const cx=x(it.f), up=k%2===0, m=it.o;
+        const mark=it.fire?'🔥':(m.emoji||'');
+        s+= mark ? `<text x="${cx}" y="${Y+7}" text-anchor="middle" font-size="20">${mark}</text>`
+                 : `<circle cx="${cx}" cy="${Y}" r="9" fill="${m.done?rail:'#fff'}" stroke="${rail}" stroke-width="3"/>`;
+        s+=lbl(cx,(m.done?'✓ ':'')+(m.label||(it.fire?L.startPh.replace('…',''):'')),m.date,up); });
+      s+=`<text x="${X1}" y="${Y+8}" text-anchor="middle" font-size="24">⭐</text>`+lbl(X1,goal.label||'',goal.date,false);
+      return s+'</svg>'; })();
     const row=(box,emoji,label,date,note)=>{
       if(!(label||'').trim()&&!date&&!(note||'').trim())return '';
       return '<li style="margin:5px 0;list-style:none">'
@@ -2388,7 +2532,7 @@ LL.registry.register({
         +(date?' <span style="color:#A39A8C;font-size:13px">— '+esc(fmt(date))+'</span>':'')
         +((note||'').trim()?'<div style="color:#6E665B;font-size:13px;font-style:italic;margin:1px 0 0 22px;white-space:pre-line">'+esc(note)+'</div>':'')
         +'</li>'; };
-    let h='<h2>'+esc(L.sumTitle)+'</h2><ul style="padding-left:0;margin:6px 0">';
+    let h='<h2>'+esc(L.sumTitle)+'</h2>'+railSvg+'<ul style="padding-left:0;margin:6px 0">';
     h+=row('🔥 ','',start.label,start.date,start.note);
     ms.forEach(m=>{ h+=row((m.done?'☑ ':'☐ '),(m.emoji?m.emoji+' ':''),m.label,m.date,m.note); });
     h+=row((goal.done?'☑ ':'⭐ '),'',goal.label,goal.date,goal.note);
@@ -3255,7 +3399,12 @@ LL.registry.register({
   exportSummary(data,lang){ const esc=LL.util.esc; const names=lang==='vi'?['Hình thành','Tập trung','Tạo đà','Ổn định','Tinh thông']:['Formulation','Concentration','Momentum','Stability','Mastery'];
     let h='<h2>'+(lang==='vi'?'Hành Trình Tinh Thông':'Mastery Walk')+'</h2>';
     if((data.skill||'').trim())h+='<p style="font-weight:600">'+esc(data.skill)+'</p>';
-    data.stages.forEach((s,i)=>{ if((s.fwd||'').trim())h+='<p><b>'+names[i]+':</b> '+esc(s.fwd)+'</p>'; });
+    // both passes: forward answer, then the "looking back from Mastery" answer (stages 1–4)
+    const backLbl=lang==='vi'?'Nhìn lại từ Tinh thông':'Looking back from Mastery';
+    const nl=s=>esc(s).replace(/\n/g,'<br>');
+    (data.stages||[]).forEach((s,i)=>{ const f=(s.fwd||'').trim(), b=(s.back||'').trim(); if(!f&&!b)return;
+      h+='<p><b>'+names[i]+':</b> '+(f?nl(s.fwd):'')+'</p>';
+      if(b) h+='<p style="margin-left:18px;color:#6E665B"><i>'+backLbl+':</i> '+nl(s.back)+'</p>'; });
     return h; }
 });
 
@@ -3332,7 +3481,31 @@ LL.registry.register({
   exportSummary(data, lang){
     const esc=LL.util.esc, L=I18N[lang]||I18N.en, lg=I18N[lang]?lang:'en';
     const cols={black:'#2A2723',yellow:'#D9A400',orange:'#E07B39',navy:'#1F3A68'};
+    const quads=data.quads||{};
+    const anything=(data.center||'').trim()||QUADS.some(q=>(quads[q.k]||[]).some(x=>(x||'').trim()));
+    if(!anything) return '';
     let h='<h2>'+esc(L.title)+'</h2>';
+    // the four-diamond map, drawn as SVG (lines shortened to fit; the full text follows below)
+    const P={top:[300,150],right:[450,300],bottom:[300,450],left:[150,300]}, D=140;
+    const tip={top:[300,10],right:[590,300],bottom:[300,590],left:[10,300]};
+    const cut=s=>{ s=(s||'').trim(); return s.length>24?s.slice(0,23)+'…':s; };
+    let svg='<svg viewBox="-20 -20 640 640" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:440px;height:auto;display:block;margin:6px auto 12px;font-family:inherit">';
+    QUADS.forEach(q=>{ const [x,y]=P[q.pos], c=cols[q.cls];
+      svg+=`<polygon points="${x},${y-D} ${x+D},${y} ${x},${y+D} ${x-D},${y}" fill="${c}" fill-opacity=".07" stroke="${c}" stroke-width="3" stroke-linejoin="round"/>`;
+      svg+=`<text x="${x}" y="${y-40}" text-anchor="middle" font-size="17" font-weight="700" fill="${c}">${q.n}. ${esc(q.t[lg])}</text>`;
+      (quads[q.k]||[]).slice(0,3).forEach((it,i)=>{ const v=cut(it); if(!v)return;
+        svg+=`<text x="${x}" y="${y-12+i*24}" text-anchor="middle" font-size="15" fill="#2A2723">${i+1}. ${esc(v)}</text>`; });
+      const [tx,ty]=tip[q.pos];
+      svg+=`<circle cx="${tx}" cy="${ty}" r="13" fill="${c}"/><text x="${tx}" y="${ty+4.5}" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">${q.n}</text>`; });
+    // centre circle with a four-colour ring (navy top, black right, yellow bottom, orange left)
+    const arc=(a0,a1)=>{ const r=64,cx=300,cy=300,p=a=>[cx+r*Math.cos(a*Math.PI/180),cy+r*Math.sin(a*Math.PI/180)]; const [x0,y0]=p(a0),[x1,y1]=p(a1);
+      return `M ${x0} ${y0} A ${r} ${r} 0 0 1 ${x1} ${y1}`; };
+    svg+='<circle cx="300" cy="300" r="64" fill="#fff"/>';
+    [[-135,-45,cols.navy],[-45,45,cols.black],[45,135,cols.yellow],[135,225,cols.orange]].forEach(([a,b,c])=>{
+      svg+=`<path d="${arc(a,b)}" fill="none" stroke="${c}" stroke-width="9"/>`; });
+    const cl=L.center.split(/\s+(?=and\b|&)/);   // "Success and Happiness" / "Thành công & Hạnh phúc" on two lines
+    cl.forEach((ln,i)=>{ svg+=`<text x="300" y="${300+(i-(cl.length-1)/2)*18+5}" text-anchor="middle" font-size="14" font-weight="700" fill="#2A2723">${esc(ln)}</text>`; });
+    h+=svg+'</svg>';
     if((data.center||'').trim()) h+='<p><b>'+esc(L.center)+':</b> '+esc(data.center).replace(/\n/g,'<br>')+'</p>';
     QUADS.forEach(q=>{
       const items=((data.quads||{})[q.k]||[]).filter(x=>(x||'').trim());
