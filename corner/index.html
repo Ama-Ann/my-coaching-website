@@ -348,6 +348,50 @@ body.calm .overlay.pin{background:radial-gradient(135% 100% at 50% -15%,#1F3A3D 
 body.calm .pin-card{background:rgba(18,40,42,.7);border-color:rgba(201,138,75,.24);}
 body.calm .pin-pad button{background:rgba(22,46,48,.62);}
 .overlay.empty{background:var(--bg);color:var(--ink);}
+/* start screen */
+.overlay.home{background:var(--bg);color:var(--ink);overflow-y:auto;align-items:flex-start;padding:clamp(24px,8vh,90px) 16px 32px;}
+.home-card{width:min(640px,100%);margin:0 auto;}
+.home-card h2{font-family:var(--display);font-size:26px;font-weight:700;text-align:center;margin:0 0 6px;}
+.home-sub{text-align:center;color:var(--ink-soft);margin:0 0 26px;}
+.overlay.home[data-view="start"] .hv-pick,.overlay.home[data-view="pick"] .hv-start{display:none;}
+.home-choices{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.home-choice{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:28px 20px 24px;border-radius:var(--radius-lg);border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow-sm);color:var(--ink);transition:.18s var(--ease);}
+.home-choice:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:var(--shadow);}
+.home-choice .hc-ic{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:var(--primary-soft);color:var(--primary);margin-bottom:6px;} .home-choice .hc-ic svg{width:28px;height:28px;}
+.home-choice b{font-size:17px;font-weight:700;} .home-choice i{font-style:normal;font-size:13.5px;color:var(--ink-soft);line-height:1.45;}
+.home-choice.primary{background:var(--primary);border-color:var(--primary);color:#fff;} .home-choice.primary i{color:rgba(255,255,255,.82);}
+.home-choice.primary .hc-ic{background:rgba(255,255,255,.16);color:#fff;} .home-choice.primary:hover{background:var(--primary-deep);}
+body.calm .home-choice.primary{color:#0C1A1C;} body.calm .home-choice.primary i{color:rgba(12,26,28,.75);} body.calm .home-choice.primary .hc-ic{background:rgba(12,26,28,.14);color:#0C1A1C;}
+.home-links{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:22px;}
+.home-link{color:var(--primary);font-weight:600;font-size:14px;padding:6px 10px;border-radius:8px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;} .home-link:hover{background:var(--primary-soft);}
+.hp-head{position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:18px;min-height:38px;}
+.hp-head h2{margin:0;padding:0 92px;} .hp-back{position:absolute;left:0;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 12px 0 8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);font-weight:600;font-size:13.5px;}
+.hp-back:hover{border-color:var(--primary);color:var(--primary);}
+.hp-body{display:flex;flex-direction:column;gap:10px;}
+.hp-row{display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:12px 14px;border-radius:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);transition:.15s var(--ease);}
+.hp-row:hover{border-color:var(--primary);background:var(--primary-soft);}
+.hp-row .av{width:40px;height:40px;flex:0 0 40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:14px;}
+.hp-row.hp-new{border-style:dashed;border-color:var(--primary);} .hp-row.hp-new .av{background:var(--primary-soft);color:var(--primary);}
+.hp-meta{flex:1;min-width:0;display:flex;flex-direction:column;} .hp-meta b{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;} .hp-meta i{font-style:normal;font-size:12.5px;color:var(--ink-faint);}
+.hp-go{color:var(--ink-faint);display:grid;}
+.hp-search{width:100%;height:42px;padding:0 14px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:14.5px;margin-top:6px;}
+.hp-search:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft);}
+.hp-list{display:flex;flex-direction:column;gap:8px;} .hp-none{text-align:center;color:var(--ink-faint);padding:18px;font-size:14px;}
+@media (max-width:680px){ .home-choices{grid-template-columns:1fr;gap:12px;} .home-choice{flex-direction:row;text-align:left;padding:16px;gap:14px;align-items:center;}
+  .home-choice .hc-ic{margin:0;width:48px;height:48px;flex:0 0 48px;} .home-choice b{display:block;} .home-choice>b,.home-choice>i{flex:none;}
+  .home-choice{display:grid;grid-template-columns:48px 1fr;grid-template-rows:auto auto;column-gap:14px;row-gap:2px;} .home-choice .hc-ic{grid-row:1/3;}
+  .home-card h2{font-size:22px;} .hp-head h2{padding:0 0 0 84px;text-align:left;font-size:19px;} }
+/* close-session dialog */
+.close-card{width:min(440px,92%);}
+.close-body{padding:16px 20px 18px;display:flex;flex-direction:column;gap:10px;} .close-body p{margin:0 0 4px;color:var(--ink-soft);font-size:14px;}
+.cl-opt{display:flex;align-items:center;gap:13px;text-align:left;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);transition:.15s var(--ease);}
+.cl-opt>span:last-child{display:flex;flex-direction:column;min-width:0;} .cl-opt b{font-weight:700;font-size:14.5px;} .cl-opt i{font-style:normal;font-size:12.5px;color:var(--ink-soft);}
+.cl-ic{width:38px;height:38px;flex:0 0 38px;border-radius:11px;display:grid;place-items:center;background:var(--primary-soft);color:var(--primary);} .cl-ic svg{width:19px;height:19px;}
+.cl-opt:hover{border-color:var(--primary);}
+.cl-opt.save{background:var(--primary);border-color:var(--primary);color:#fff;} .cl-opt.save i{color:rgba(255,255,255,.82);} .cl-opt.save .cl-ic{background:rgba(255,255,255,.16);color:#fff;} .cl-opt.save:hover{background:var(--primary-deep);}
+body.calm .cl-opt.save{color:#0C1A1C;} body.calm .cl-opt.save i{color:rgba(12,26,28,.75);} body.calm .cl-opt.save .cl-ic{background:rgba(12,26,28,.14);color:#0C1A1C;}
+.cl-opt.discard .cl-ic{background:color-mix(in srgb,var(--coral) 14%,transparent);color:var(--coral);} .cl-opt.discard:hover{border-color:var(--coral);}
+.cl-opt.discard.armed{border-color:var(--coral);background:color-mix(in srgb,var(--coral) 9%,var(--surface));} .cl-opt.discard.armed i{color:var(--coral);font-weight:600;}
 .empty-card{text-align:center;max-width:380px;padding:40px;}
 .empty-card .ill{width:90px;height:90px;border-radius:24px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;margin:0 auto 20px;} .empty-card .ill svg{width:44px;height:44px;}
 .empty-card h2{font-size:22px;font-weight:700;margin-bottom:8px;} .empty-card p{color:var(--ink-soft);margin-bottom:22px;line-height:1.55;}
@@ -438,6 +482,7 @@ body.present .present-bar{display:flex;}
       <span class="sc-meta"><b id="scClient" data-i18n="no_client">No client</b><i id="scSession"></i></span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
     </button>
+    <button class="tbtn close-sess coach-only" id="closeSessBtn" onclick="LL.session.askClose()" title="Close session" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg><span data-i18n="close_session">Close session</span></button>
     <div class="spacer"></div>
     <span class="saved coach-only" id="saved"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg><span id="savedTxt" data-i18n="saved">Saved</span></span>
     <div class="timer coach-only" id="timer">
@@ -542,12 +587,51 @@ body.present .present-bar{display:flex;}
         <div class="conf"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg><span data-i18n="pin_foot">Local only · nothing is uploaded</span></div>
       </div>
     </div>
-    <div class="overlay empty" id="overlay-empty">
-      <div class="empty-card">
-        <div class="ill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8M19 8v6M22 11h-6"/></svg></div>
-        <h2 data-i18n="empty_h">Welcome to Hai Pham's Corner</h2>
-        <p data-i18n="empty_p">No clients yet. Add your first client to start a calm, focused session.</p>
-        <button class="btn-primary big" onclick="LL.library.newClient()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="empty_btn">Add your first client</span></button>
+    <!-- START SCREEN: shown every time the Corner opens and after a session is closed -->
+    <div class="overlay home" id="overlay-home" data-view="start">
+      <div class="home-card">
+        <div class="hv-start">
+          <h2 data-i18n="empty_h">Welcome to Hai Pham's Corner</h2>
+          <p class="home-sub" data-i18n="home_p">What would you like to do?</p>
+          <div class="home-choices">
+            <button class="home-choice" onclick="LL.library.newClient()">
+              <span class="hc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8M19 8v6M22 11h-6"/></svg></span>
+              <b data-i18n="home_add">Add new client</b><i data-i18n="home_add_d">Create a client profile and open their first session</i>
+            </button>
+            <button class="home-choice primary" onclick="LL.home.startSession()">
+              <span class="hc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg></span>
+              <b data-i18n="home_start">Start a new session</b><i data-i18n="home_start_d">For a brand new client or one you already coach</i>
+            </button>
+          </div>
+          <div class="home-links">
+            <button class="home-link" id="homeResume" style="display:none"><span data-i18n="home_resume">Continue unfinished session</span>: <b></b></button>
+            <button class="home-link" onclick="LL.ui.openDrawer('clients')" data-i18n="home_browse">Clients &amp; past sessions</button>
+          </div>
+        </div>
+        <div class="hv-pick">
+          <div class="hp-head"><button class="hp-back" onclick="LL.home.show('start')" title="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg><span data-i18n="back">Back</span></button>
+            <h2 data-i18n="pick_h">Who is this session for?</h2></div>
+          <div class="hp-body" id="homeBody"></div>
+        </div>
+      </div>
+    </div>
+    <!-- CLOSE SESSION (kept below the takeaway overlay, so "Download takeaway" opens on top of it) -->
+    <div class="overlay modal" id="overlay-close" role="dialog" aria-modal="true" aria-labelledby="closeTitle">
+      <div class="modal-card close-card">
+        <div class="modal-h"><h3 id="closeTitle" data-i18n="close_h">Close this session</h3><button class="x" onclick="LL.ui.hideOverlay('close')">✕</button></div>
+        <div class="close-body">
+          <p data-i18n="close_p">How would you like to finish?</p>
+          <button class="cl-opt save" onclick="LL.session.close('save')">
+            <span class="cl-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+            <span><b data-i18n="close_save">Save &amp; close</b><i data-i18n="close_save_d">Keep everything noted in this session</i></span></button>
+          <button class="cl-opt take" onclick="LL.export.open()">
+            <span class="cl-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></span>
+            <span><b data-i18n="close_take">Download takeaway</b><i data-i18n="close_take_d">Preview, then download or print the client's takeaway</i></span></button>
+          <button class="cl-opt discard" id="closeDiscard" onclick="LL.session.discardClick(this)">
+            <span class="cl-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></span>
+            <span><b data-i18n="close_discard">Close without saving</b><i id="closeDiscardD"></i></span></button>
+        </div>
+        <div class="modal-foot"><button class="btn-ghost" onclick="LL.ui.hideOverlay('close')"><span data-i18n="close_keep">Keep working</span></button></div>
       </div>
     </div>
     <div class="overlay modal" id="overlay-export">
@@ -634,7 +718,17 @@ const STR={
   ex_unavailable:"This exercise isn't available",quota:"Storage full — export a backup & remove old images",cgv_ph_contract:"",cgv_ph_goal:"",cgv_ph_vision:"",note_ph:"",
   set_length:"Session length",confirm:"Confirm",cancel:"Cancel",summary_for:"Prepared for",by_coach:"with your coach",
   take_actions:"Your commitments",take_wins:"Wins & strengths",appreciation:"A word of appreciation",
-  take_wins_ph:"Strengths and wins you noticed in this session…",take_appr_ph:"A personal word to close the session…"},
+  take_wins_ph:"Strengths and wins you noticed in this session…",take_appr_ph:"A personal word to close the session…",
+  home_p:"What would you like to do?",home_add:"Add new client",home_add_d:"Create a client profile and open their first session",
+  home_start:"Start a new session",home_start_d:"For a brand new client or one you already coach",home_browse:"Clients & past sessions",
+  home_resume:"Continue unfinished session",pick_h:"Who is this session for?",pick_new:"Brand new client",
+  pick_new_d:"Add the client first, then the session starts",pick_search:"Search clients…",pick_none:"No client matches",
+  back:"Back",close_session:"Close session",close_h:"Close this session",close_p:"How would you like to finish?",
+  close_save:"Save & close",close_save_d:"Keep everything noted in this session",close_take:"Download takeaway",
+  close_take_d:"Preview, then download or print the client's takeaway",close_discard:"Close without saving",
+  close_discard_new:"This new session will be deleted",close_discard_old:"Changes made since you opened it will be undone",
+  close_discard_arm:"Tap again to close without saving",close_keep:"Keep working",closed_saved:"Session saved",
+  closed_deleted:"Session closed — not saved",closed_reverted:"Session closed — changes undone"},
  vi:{brand:"Hai Pham's Corner",tagline:"",no_client:"Chưa có khách",saved:"Đã lưu",saving:"Đang lưu…",calm:"Tĩnh lặng",presenter:"Trình bày",
   t_clients:"Khách hàng",t_add:"Thêm khối",t_ex:"Bài tập",t_take:"Tổng kết",t_lock:"Khoá",
   cgv_contract:"Cam kết",cgv_goal:"Mục tiêu",cgv_vision:"Hình dung",add_block:"Thêm khối",grp_blocks:"Khối",grp_exercises:"Bài tập",
@@ -663,7 +757,17 @@ const STR={
   ex_unavailable:"Bài tập này hiện không khả dụng",quota:"Bộ nhớ đầy — hãy sao lưu & xoá bớt ảnh cũ",cgv_ph_contract:"",cgv_ph_goal:"",cgv_ph_vision:"",note_ph:"",
   set_length:"Thời lượng buổi",confirm:"Xác nhận",cancel:"Huỷ",summary_for:"Dành cho",by_coach:"cùng coach của bạn",
   take_actions:"Cam kết của bạn",take_wins:"Thành quả & điểm mạnh",appreciation:"Đôi lời trân trọng",
-  take_wins_ph:"Điểm mạnh và thành quả bạn nhận thấy trong buổi này…",take_appr_ph:"Đôi lời nhắn gửi để khép lại buổi…"}
+  take_wins_ph:"Điểm mạnh và thành quả bạn nhận thấy trong buổi này…",take_appr_ph:"Đôi lời nhắn gửi để khép lại buổi…",
+  home_p:"Bạn muốn làm gì?",home_add:"Thêm khách hàng mới",home_add_d:"Tạo hồ sơ khách hàng và mở buổi đầu tiên",
+  home_start:"Bắt đầu buổi mới",home_start_d:"Cho khách hàng mới hoặc khách hàng đang coach",home_browse:"Khách hàng & các buổi trước",
+  home_resume:"Tiếp tục buổi chưa đóng",pick_h:"Buổi này dành cho ai?",pick_new:"Khách hàng mới",
+  pick_new_d:"Thêm khách hàng trước, rồi bắt đầu buổi",pick_search:"Tìm khách hàng…",pick_none:"Không có khách hàng phù hợp",
+  back:"Quay lại",close_session:"Đóng buổi",close_h:"Đóng buổi này",close_p:"Bạn muốn kết thúc thế nào?",
+  close_save:"Lưu & đóng",close_save_d:"Giữ lại mọi ghi chép của buổi",close_take:"Tải bản tổng kết",
+  close_take_d:"Xem trước rồi tải hoặc in bản tổng kết cho khách",close_discard:"Đóng, không lưu",
+  close_discard_new:"Buổi mới này sẽ bị xoá",close_discard_old:"Mọi thay đổi từ lúc mở buổi sẽ bị huỷ",
+  close_discard_arm:"Chạm lần nữa để đóng mà không lưu",close_keep:"Tiếp tục làm việc",closed_saved:"Đã lưu buổi",
+  closed_deleted:"Đã đóng buổi — không lưu",closed_reverted:"Đã đóng buổi — đã huỷ thay đổi"}
 };
 const I = LL.i18n = {
   lang:'en', strings:STR,
@@ -673,7 +777,8 @@ const I = LL.i18n = {
     document.getElementById('langVI').classList.toggle('on',l==='vi');
     // apply() resets every [data-i18n] element, including the client chip's "No client" placeholder,
     // so redraw the header afterwards to put the real client name back.
-    I.apply(); LL.ui.renderHeader(); LL.blocks.render(); LL.library.render(); LL.registry.renderPickers(); LL.ui.renderCGV();},
+    I.apply(); LL.ui.renderHeader(); LL.blocks.render(); LL.library.render(); LL.registry.renderPickers(); LL.ui.renderCGV();
+    if(LL.home)LL.home.render();},
   apply(){ document.querySelectorAll('[data-i18n]').forEach(e=>{const v=I.t(e.getAttribute('data-i18n')); if(typeof v==='string')e.textContent=v;});
     document.documentElement.lang=I.lang; if(LL.ui&&LL.ui.renderBrand)LL.ui.renderBrand(); }
 };
@@ -723,6 +828,7 @@ LL.state.touch = function(opts){
 };
 LL.state.flush = async function(){ clearTimeout(saveTimer);
   try{ if(S.session) await LL.db.put('sessions',S.session); if(S.meta) await LL.db.put('meta',Object.assign({key:'app'},S.meta)); setSaved(false);}catch(e){} };
+LL.state.cancelSave = function(){ clearTimeout(saveTimer); clearTimeout(snapTimer); setSaved(false); };
 window.addEventListener('beforeunload',()=>{ if(S.session) navigator.storage&&LL.state.flush(); });
 document.addEventListener('visibilitychange',()=>{ if(document.hidden) LL.state.flush(); });
 
@@ -866,18 +972,52 @@ U.autoSessionName=(client,ts)=>U.clientSlug(client&&client.name)+'_'+U.ddmmyy(ts
 LL.session = {
   async create(clientId,title){
     const c=S.clients[clientId]; const now=Date.now();
+    // draft:true until the coach chooses "Save & close" — "close without saving" then deletes it outright
     const s={id:U.uid('se_'),clientId,title:(title&&title.trim())||U.autoSessionName(c,now),createdAt:now,updatedAt:now,
-      cgv:{tab:'contract',contract:'',goal:'',vision:''},blocks:[]};
+      cgv:{tab:'contract',contract:'',goal:'',vision:''},blocks:[],draft:true};
     await db.put('sessions',s);
     if(c){ c.sessionIds.unshift(s.id); c.updatedAt=now; await db.put('clients',c); }
     return s;
   },
   async load(id){ const s=await db.get('sessions',id); if(!s)return;
+    // opening another session from the drawer keeps (saves) the one being left
+    if(S.session&&S.session.id!==id) await LL.session.commit();
     S.session=s; S.meta.activeSessionId=s.id; S.meta.activeClientId=s.clientId;
+    LL.session._orig=U.clone(s); LL.session._added=new Set();
     LL.history.undo.length=0; LL.history.redo.length=0; LL.history.base=U.clone(s);
     await db.put('meta',Object.assign({key:'app'},S.meta));
-    LL.ui.renderHeader(); LL.ui.renderCGV(); LL.blocks.render(); LL.library.render(); LL.ui.hideOverlay('empty');
+    LL.ui.renderHeader(); LL.ui.renderCGV(); LL.blocks.render(); LL.library.render(); LL.ui.hideOverlay('home');
   },
+  /* images referenced anywhere in a session (vision blocks today, any future block that stores an imageId) */
+  imageIds(s){ const ids=new Set(); if(!s)return ids; const re=/"imageId":"([^"]+)"/g, j=JSON.stringify(s); let m; while((m=re.exec(j)))ids.add(m[1]); return ids; },
+  noteImage(id){ (LL.session._added=LL.session._added||new Set()).add(id); },
+  async _dropImages(drop,keep){ for(const id of drop){ if(!keep.has(id)) await db.del('images',id).catch(()=>{}); } },
+  /* keep the open session as it is now */
+  async commit(){ const s=S.session; if(!s)return; const orig=LL.session._orig;
+    delete s.draft; s.updatedAt=Date.now(); await db.put('sessions',s);
+    const c=S.clients[s.clientId]; if(c){ c.updatedAt=Date.now(); await db.put('clients',c); }
+    // images that were replaced or removed during the session are no longer needed
+    const keep=LL.session.imageIds(s); await LL.session._dropImages([...LL.session.imageIds(orig),...(LL.session._added||[])],keep);
+    LL.session._orig=U.clone(s); LL.session._added=new Set(); },
+  /* close-session dialog */
+  askClose(){ const s=S.session; if(!s)return; LL.ui.closeDrawer(); LL.ui.closeAddMenu();
+    const d=document.getElementById('closeDiscard'); d.classList.remove('armed');
+    document.getElementById('closeDiscardD').textContent=s.draft?t('close_discard_new'):t('close_discard_old');
+    LL.ui.showOverlay('close'); },
+  discardClick(btn){ if(!btn.classList.contains('armed')){ btn.classList.add('armed'); document.getElementById('closeDiscardD').textContent=t('close_discard_arm'); return; }
+    LL.session.close('discard'); },
+  async close(mode){ const s=S.session; if(!s)return; let msg;
+    if(mode==='save'){ LL.state.cancelSave(); await LL.session.commit(); msg=t('closed_saved'); }
+    else { LL.state.cancelSave(); const orig=LL.session._orig, added=LL.session._added||new Set();
+      if(s.draft){ // never saved: remove the session and every image it brought in
+        await db.del('sessions',s.id); const c=S.clients[s.clientId];
+        if(c){ c.sessionIds=c.sessionIds.filter(x=>x!==s.id); await db.put('clients',c); }
+        await LL.session._dropImages([...LL.session.imageIds(s),...added],new Set()); msg=t('closed_deleted'); }
+      else { // put the session back exactly as it was when opened
+        await db.put('sessions',orig); await LL.session._dropImages([...LL.session.imageIds(s),...added],LL.session.imageIds(orig)); msg=t('closed_reverted'); } }
+    S.session=null; S.meta.activeSessionId=null; S.meta.activeClientId=null; LL.session._orig=null; LL.session._added=new Set();
+    await db.put('meta',Object.assign({key:'app'},S.meta));
+    LL.ui.goHome(); LL.ui.toast(msg); },
   setTitle(v){ if(S.session){S.session.title=v; LL.state.touch({silent:true}); LL.ui.renderHeader(); LL.library.render();} },
   async rename(id){ const cur=(S.session&&S.session.id===id)?S.session:await db.get('sessions',id); if(!cur)return;
     const name=prompt(t('session_title'),cur.title); if(name===null)return; const nm=name.trim(); if(!nm)return;
@@ -889,10 +1029,8 @@ LL.session = {
     let c=null; for(const k in S.clients){ if(S.clients[k].sessionIds.includes(id)){ c=S.clients[k]; break; } }
     await db.del('sessions',id);
     if(c){ c.sessionIds=c.sessionIds.filter(x=>x!==id); c.updatedAt=Date.now(); await db.put('clients',c); }
-    if(S.meta.activeSessionId===id){ S.session=null; S.meta.activeSessionId=null;
-      if(c&&c.sessionIds.length){ await LL.session.load(c.sessionIds[0]); }
-      else { await db.put('meta',Object.assign({key:'app'},S.meta));
-        LL.ui.renderHeader(); document.getElementById('blocks').innerHTML=''; LL.ui.renderCGV(); } }
+    if(S.meta.activeSessionId===id){ LL.state.cancelSave(); S.session=null; S.meta.activeSessionId=null;
+      await db.put('meta',Object.assign({key:'app'},S.meta)); LL.ui.goHome(); }
     LL.library.render();
   }
 };
@@ -911,13 +1049,12 @@ LL.library = {
   async deleteClient(id){ if(!confirm(t('delete_client_q')))return; const c=S.clients[id]; if(!c)return;
     for(const sid of c.sessionIds) await db.del('sessions',sid);
     delete S.clients[id]; await db.del('clients',id);
-    if(S.meta.activeClientId===id){ S.session=null; S.meta.activeClientId=null; S.meta.activeSessionId=null;
-      const rest=Object.values(S.clients).sort((a,b)=>b.updatedAt-a.updatedAt);
-      if(rest.length&&rest[0].sessionIds.length) await LL.session.load(rest[0].sessionIds[0]);
-      else { LL.ui.renderHeader(); document.getElementById('blocks').innerHTML=''; LL.ui.renderCGV(); LL.ui.showOverlay('empty'); } }
+    if(S.meta.activeClientId===id||(S.session&&S.session.clientId===id)){ LL.state.cancelSave(); S.session=null; S.meta.activeClientId=null; S.meta.activeSessionId=null;
+      await db.put('meta',Object.assign({key:'app'},S.meta)); LL.ui.goHome(); }
     LL.library.render();
   },
   render(){
+    if(LL.home)LL.home.render();
     const box=document.getElementById('clientsBody'); if(!box)return; box.innerHTML='';
     const list=Object.values(S.clients).sort((a,b)=>b.updatedAt-a.updatedAt);
     if(!list.length){ box.appendChild(el('div',{class:'wins-empty',style:'padding:24px 10px'},t('empty_p'))); return; }
@@ -951,6 +1088,41 @@ LL.library = {
     if(c){ const nodes=box.querySelectorAll('.sess-wrap .sess:not(.newsess)');
       c.sessionIds.forEach(async(sid,i)=>{ const sess=S.session&&S.session.id===sid?S.session:await db.get('sessions',sid);
         if(nodes[i]&&sess){ nodes[i].querySelector('.st-name').textContent=sess.title; nodes[i].querySelector('.dt').textContent=U.fmtDate(sess.updatedAt);} }); }
+  }
+};
+
+/* -------------------- start screen (shown every time the Corner opens) -------------------- */
+LL.home = {
+  view:'start', q:'',
+  show(view){ LL.home.view=view||'start'; LL.home.q=''; LL.home.render(); LL.ui.showOverlay('home');
+    if(LL.home.view==='pick'){ const i=document.getElementById('homeSearch'); if(i&&window.innerWidth>680)setTimeout(()=>i.focus(),30); } },
+  startSession(){ if(!Object.keys(S.clients).length){ LL.library.newClient(); return; } LL.home.show('pick'); },
+  render(){ const box=document.getElementById('homeBody'); if(!box)return;
+    const pane=document.getElementById('overlay-home'); if(pane)pane.dataset.view=LL.home.view;
+    const resume=document.getElementById('homeResume');
+    if(resume){ const id=S.meta&&S.meta.activeSessionId; resume.style.display='none';
+      if(id&&!S.session) db.get('sessions',id).then(se=>{ if(!se||S.session)return; resume.style.display='';
+        resume.querySelector('b').textContent=se.title; resume.onclick=()=>LL.session.load(id); }); }
+    if(LL.home.view!=='pick'){ box.innerHTML=''; return; }
+    const ic='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>';
+    let list=box.querySelector('.hp-list'), search=document.getElementById('homeSearch');
+    if(!list){ box.innerHTML='';
+      search=el('input',{type:'search',id:'homeSearch',class:'hp-search',placeholder:t('pick_search'),autocomplete:'off',
+        oninput(e){ LL.home.q=e.target.value; LL.home.render(); }});
+      box.appendChild(el('button',{class:'hp-row hp-new',onclick(){LL.library.newClient();}},
+        el('span',{class:'av',html:ic}), el('span',{class:'hp-meta'},el('b',{},t('pick_new')),el('i',{},t('pick_new_d')))));
+      box.appendChild(search); list=el('div',{class:'hp-list'}); box.appendChild(list); }
+    else { const nb=box.querySelector('.hp-new'); nb.querySelector('b').textContent=t('pick_new'); nb.querySelector('i').textContent=t('pick_new_d'); }
+    search.placeholder=t('pick_search');
+    const q=LL.home.q.trim().toLowerCase(); list.innerHTML='';
+    const rows=Object.values(S.clients).sort((a,b)=>b.updatedAt-a.updatedAt).filter(c=>!q||c.name.toLowerCase().includes(q));
+    if(!rows.length){ list.appendChild(el('div',{class:'hp-none'},t('pick_none'))); return; }
+    for(const c of rows){ const n=c.sessionIds.length;
+      const sub=n+' '+t('session').toLowerCase()+(n!==1&&LL.i18n.lang==='en'?'s':'')+' · '+U.fmtDate(c.updatedAt);
+      list.appendChild(el('button',{class:'hp-row',onclick(){LL.library.newSession(c.id);}},
+        el('span',{class:'av',style:`background:${c.color}`},U.initials(c.name)),
+        el('span',{class:'hp-meta'},el('b',{},c.name),el('i',{},sub)),
+        el('span',{class:'hp-go',html:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 6l6 6-6 6"/></svg>'}))); }
   }
 };
 
@@ -1054,7 +1226,7 @@ LL.blocks = (function(){
     if(block.imageId)showImg(); else ph();
     pic.addEventListener('click',()=>{ const inp=el('input',{type:'file',accept:'image/*'});
       inp.addEventListener('change',()=>{ const f=inp.files[0]; if(!f)return; downscale(f,720,async(dataUrl)=>{
-        const id=U.uid('img_'); await db.put('images',{id,dataUrl}); if(block.imageId)db.del('images',block.imageId).catch(()=>{});
+        const id=U.uid('img_'); await db.put('images',{id,dataUrl}); LL.session.noteImage(id);
         block.imageId=id; showImg(); LL.state.touch(); }); }); inp.click(); });
     const metaphor=el('div',{class:'metaphor'+((block.metaphor||'').trim()?'':' empty'),contenteditable:'true','data-ph':'',
       oninput(e){block.metaphor=e.target.textContent;e.target.classList.toggle('empty',!e.target.textContent.trim());LL.state.touch();}}); metaphor.textContent=block.metaphor||'';
@@ -1345,7 +1517,13 @@ Object.assign(LL.ui,{
     document.getElementById('scClient').textContent=c?c.name:t('no_client');
     document.getElementById('scSession').textContent=s?s.title:'';
     document.getElementById('scAv').textContent=c?U.initials(c.name):'–';
-    if(c)document.getElementById('scAv').style.background=c.color; },
+    document.getElementById('scAv').style.background=c?c.color:'';
+    const cb=document.getElementById('closeSessBtn'); if(cb)cb.style.display=s?'':'none'; },
+  /* back to the start screen with nothing open */
+  goHome(){ LL.ui.hideOverlay('close'); LL.ui.hideOverlay('export'); LL.ui.closeDrawer(); LL.ui.closeAddMenu();
+    if(LL.present&&document.body.classList.contains('present'))LL.present.toggle(false);
+    LL.history.undo.length=0; LL.history.redo.length=0; LL.history.base=null;
+    document.getElementById('blocks').innerHTML=''; LL.ui.renderHeader(); LL.ui.renderCGV(); LL.library.render(); LL.home.show('start'); },
 
   /* ----- brand: name + tagline + logo (per-browser, editable in Settings) ----- */
   brandName(){ const m=S.meta||{}; return (m.brandName&&m.brandName.trim())?m.brandName:t('brand'); },
@@ -1469,11 +1647,9 @@ LL.boot=async function(){
   const clients=await db.getAll('clients'); clients.forEach(c=>S.clients[c.id]=c);
   LL.registry.renderPickers(); LL.library.render(); LL.ui.renderBrand(); LL.ui.initSettings();
   if(meta.pin) LL.lock.verifyOnBoot();
-  // load active or latest session
-  if(meta.activeSessionId){ await LL.session.load(meta.activeSessionId); }
-  else { const list=Object.values(S.clients).sort((a,b)=>b.updatedAt-a.updatedAt);
-    if(list.length&&list[0].sessionIds.length) await LL.session.load(list[0].sessionIds[0]);
-    else { LL.ui.renderHeader(); LL.ui.renderCGV(); if(!clients.length){ LL.ui.showOverlay('empty'); } } }
+  // always open on the start screen — never straight into the last session's notes.
+  // (A session left open without "Close session" is offered as "Continue unfinished session".)
+  LL.ui.renderHeader(); LL.ui.renderCGV(); LL.home.show('start');
 };
 
 })(LL);
