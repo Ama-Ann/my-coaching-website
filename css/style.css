@@ -1,3 +1,14 @@
+/* Heading font, self-hosted (no third-party requests). Fraunces includes every Vietnamese
+   letter (ầ ấ ố ữ ...). Georgia lacks the double-mark letters, so the browser drew the tone mark
+   loose beside the letter: "câ`n đấ´t" instead of "cần đất". */
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../fonts/fraunces.woff2") format("woff2");
+}
+
 :root {
   --color-primary: #0b4a9e;
   --color-primary-light: #1565d8;
@@ -23,7 +34,7 @@ body {
 }
 
 h1, h2, h3 {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Fraunces", "Times New Roman", serif;
   color: var(--color-primary);
   line-height: 1.25;
   text-wrap: balance;
@@ -59,7 +70,7 @@ a {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Fraunces", "Times New Roman", serif;
   font-size: 1.3rem;
   font-weight: bold;
   color: var(--color-primary);
@@ -655,7 +666,7 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 }
 
 .wheel-cta-tagline {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Fraunces", "Times New Roman", serif;
   font-size: 1.5rem;
   font-weight: bold;
   color: var(--color-primary);
@@ -742,7 +753,7 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 }
 
 .quote-text {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Fraunces", "Times New Roman", serif;
   font-style: italic;
   font-size: 1.35rem;
   line-height: 1.5;
