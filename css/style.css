@@ -1,8 +1,8 @@
 :root {
-  --color-primary: #1f3a3d;
-  --color-primary-light: #2c5054;
+  --color-primary: #0b4a9e;
+  --color-primary-light: #1565d8;
   --color-accent: #c98a4b;
-  --color-bg: #faf7f2;
+  --color-bg: #f5f8fd;
   --color-bg-alt: #ffffff;
   --color-text: #2a2a2a;
   --color-text-muted: #5c5c5c;
@@ -333,7 +333,7 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
   border: 1px solid #ddd;
   border-radius: var(--radius);
   padding: 20px 28px;
-  box-shadow: 0 3px 12px rgba(31, 58, 61, 0.08);
+  box-shadow: 0 3px 12px rgba(8, 58, 126, 0.08);
 }
 
 .card h3 {
@@ -444,7 +444,7 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 
 .blog-post.image-expanded > .blog-post-illustration {
   width: 50%;
-  box-shadow: 0 8px 24px rgba(31, 58, 61, 0.25);
+  box-shadow: 0 8px 24px rgba(8, 58, 126, 0.25);
 }
 
 .blog-post.image-expanded > img[src*="blog-illustration-road"],
@@ -477,7 +477,7 @@ html.lang-vi .i18n-inline[data-lang="vi"] {
 }
 
 .blog-post.image-expanded .blog-post-illustration-wrap .blog-post-illustration {
-  box-shadow: 0 8px 24px rgba(31, 58, 61, 0.25);
+  box-shadow: 0 8px 24px rgba(8, 58, 126, 0.25);
 }
 
 .blog-post-illustration-credit {
